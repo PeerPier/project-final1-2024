@@ -12,7 +12,7 @@ import logoKKU from "../pic/logo-head.jpg";
 import { IoIosSearch } from "react-icons/io";
 import { PiUserCircleFill } from "react-icons/pi";
 import { RxHamburgerMenu } from "react-icons/rx";
-import axios from "axios";
+import { FaUserAlt } from "react-icons/fa";
 import {
   IoMdSettings,
   IoIosStats,
@@ -25,6 +25,7 @@ import Notifications from "./chat/Notification";
 import { searchPost } from "../api/search";
 import { Dropdown } from "react-bootstrap";
 import { FaUser } from "react-icons/fa";
+import axios from "axios";
 
 const cates = ["Piyarat U", "ท่องเที่ยว", "Pearr"].map((name, index) => ({
   name,
@@ -41,10 +42,11 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [feeds, setFeeds] = useState<Post[] | null>(null);
   const [userId, setUserId] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [isNotiOpen, setIsNotiOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [isNotiOpen, setIsNotiOpen] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
 
   useEffect(() => {
@@ -60,13 +62,41 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    const header = document.querySelector(".headerr");
+    const menu = document.querySelector("#menu-icon");
+    const navmenu = document.querySelector(".navmenu");
+
+    const handleScroll = () => {
+      header?.classList.toggle("sticky", window.scrollY > 0);
+    };
+
+    const handleMenuClick = () => {
+      menu?.classList.toggle("bx-x");
+      navmenu?.classList.toggle("open");
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    menu?.addEventListener("click", handleMenuClick);
+
     const storedUserId = localStorage.getItem("userId");
     if (storedUserId) {
       setUserId(storedUserId);
     }
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      menu?.removeEventListener("click", handleMenuClick);
+    };
   }, []);
 
   const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  const handleClick = () => {
+    if (!showDropdown) {
+      inputRef.current?.focus();
+    }
     setShowDropdown(!showDropdown);
   };
 
@@ -79,22 +109,87 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
       search.length && cate.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  // const handleKeyPress = async (
+  //   event: React.KeyboardEvent<HTMLInputElement>
+  // ) => {
+  //   if (event.key === "Enter") {
+  //     const query = (event.target as HTMLInputElement).value.trim();
+
+  //     if (!query) {
+  //       console.error("Invalid query:", query);
+  //       return;
+  //     }
+
+  //     setLoading(true);
+
+  //     try {
+  //       const encodedQuery = encodeURIComponent(query);
+  //       const endpoint =
+  //         searchType === "users"
+  //           ? `http://localhost:3001/users/search?query=${encodedQuery}`
+  //           : `http://localhost:3001/posts/search?query=${encodedQuery}`;
+
+  //       const response = await fetch(endpoint, {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       });
+
+  //       if (!response.ok) {
+  //         const statusText = response.statusText || "Unknown Error";
+  //         throw new Error(`Server returned ${response.status} ${statusText}`);
+  //       }
+
+  //       const data = await response.json();
+  //       console.log("Search results:", data);
+
+  //       // ส่งข้อมูลไปยังหน้าใหม่
+  //       navigate("/search", { state: { searchResult: data, searchType } });
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }
+  // };
+
   const handleKeyPress = async (
     event: React.KeyboardEvent<HTMLInputElement>
   ) => {
     if (event.key === "Enter") {
       const query = (event.target as HTMLInputElement).value.trim();
-      if (!query) return;
+
+      if (!query) {
+        console.error("คำค้นหาห้ามเป็นค่าว่าง");
+        return; // ไม่ดำเนินการเรียก API หากคำค้นหาว่าง
+      }
+
       setLoading(true);
+
       try {
-        await searchPost(query);
-        navigate("/search", { state: { searchQuery: query } });
+        const posts = await searchPost(query);
+
+        console.log("ผลลัพธ์การค้นหา:", posts);
+
+        // นำทางไปยังหน้าแสดงผลการค้นหา
+        navigate("/search", {
+          state: { searchQuery: query },
+        });
       } catch (error) {
-        console.error("Error fetching posts:", error);
+        console.error("ข้อผิดพลาดในการดึงโพสต์:", error);
       } finally {
         setLoading(false);
       }
     }
+  };
+
+  const handleClickselectPost = () => {
+    setDropdownOpen(!dropdownOpen); // Toggle Dropdown visibility
+  };
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
   };
 
   const handleLogout = useCallback(() => {
@@ -103,9 +198,22 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
     navigate("/login");
   }, [navigate]);
 
-  const toggleNotiMenu = () => {
-    setIsNotiOpen(!isNotiOpen);
-  };
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        inputRef.current &&
+        !inputRef.current.contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleNotificationClick = async (
     e: React.MouseEvent<HTMLAnchorElement>,
@@ -150,6 +258,10 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
     const intervalId = setInterval(fetchNotifications, 5000);
     return () => clearInterval(intervalId);
   }, [userId]);
+
+  const toggleNotiMenu = () => {
+    setIsNotiOpen(!isNotiOpen);
+  };
 
   const NotificationIcon = () => {
     const unreadCount = useMemo(
@@ -227,8 +339,12 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
               placeholder="Search..."
               type="text"
             />
-            <IoIosSearch onClick={toggleDropdown} />
+            <IoIosSearch
+              onClick={handleClick}
+              className={`uil uil-${showDropdown ? "multiply" : "search"}`}
+            />
           </div>
+          <NotificationIcon />
           <div className={`items ${showDropdown ? "open" : ""}`}>
             {filteredCate.length > 0 &&
               filteredCate.map((cate) => (
@@ -237,9 +353,39 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
                 </button>
               ))}
           </div>
-          <NotificationIcon />
+
+          <Notifications />
+
           <div className="user-profile-dropdown">
-            <PiUserCircleFill onClick={toggleDropdown} />
+            <PiUserCircleFill onClick={handleClickselectPost} />
+            {/* {isOpen && (
+              <div className="dropdown-item1">
+                <ul>
+                  <li>
+                    <FaUserAlt />
+                    <Link to={`/profile/${userId}`}>โปรไฟล์</Link>
+                  </li>
+                  <li>
+                    <IoMdSettings />
+                    <a href="#">ตั้งค่า</a>
+                  </li>
+                  <li>
+                    <IoIosStats />
+                    <a href="#">สถิติ</a>
+                  </li>
+                  <li>
+                    <IoIosHelpCircleOutline />
+                    <a href="#">ช่วยเหลือ</a>
+                  </li>
+                  <li>
+                    <IoLogOutOutline />
+                    <a href="#" onClick={handleLogout}>
+                      ออกจากระบบ
+                    </a>
+                  </li>
+                </ul>
+                
+              </div> */}
             <Dropdown
               show={dropdownOpen}
               onToggle={() => setDropdownOpen(false)}
@@ -269,14 +415,16 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
                 </Dropdown.Item>
                 <Dropdown.Item href="#/action-4">
                   <div className="d-flex">
-                    <IoIosHelpCircleOutline
-                      style={{ fontSize: "20px", marginRight: "15px" }}
-                    />
-                    <p className="m-0">ช่วยเหลือ</p>
+                    <div className="d-flex">
+                      <IoIosHelpCircleOutline
+                        style={{ fontSize: "20px", marginRight: "15px" }}
+                      />
+                      <p className="m-0">ช่วยเหลือ</p>
+                    </div>
                   </div>
                 </Dropdown.Item>
-                <Dropdown.Item onClick={handleLogout}>
-                  <div className="d-flex">
+                <Dropdown.Item>
+                  <div className="d-flex" onClick={handleLogout}>
                     <IoLogOutOutline
                       style={{ fontSize: "20px", marginRight: "15px" }}
                     />
@@ -285,7 +433,9 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
+            {/* )} */}
           </div>
+
           <div className="bx bx-menu" id="menu-icon">
             <RxHamburgerMenu />
           </div>
