@@ -41,7 +41,6 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [feeds, setFeeds] = useState<Post[] | null>(null);
   const [userId, setUserId] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -61,41 +60,13 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const header = document.querySelector(".headerr");
-    const menu = document.querySelector("#menu-icon");
-    const navmenu = document.querySelector(".navmenu");
-
-    const handleScroll = () => {
-      header?.classList.toggle("sticky", window.scrollY > 0);
-    };
-
-    const handleMenuClick = () => {
-      menu?.classList.toggle("bx-x");
-      navmenu?.classList.toggle("open");
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    menu?.addEventListener("click", handleMenuClick);
-
     const storedUserId = localStorage.getItem("userId");
     if (storedUserId) {
       setUserId(storedUserId);
     }
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      menu?.removeEventListener("click", handleMenuClick);
-    };
   }, []);
 
   const toggleDropdown = () => {
-    setShowDropdown(!showDropdown);
-  };
-
-  const handleClick = () => {
-    if (!showDropdown) {
-      inputRef.current?.focus();
-    }
     setShowDropdown(!showDropdown);
   };
 
@@ -108,87 +79,22 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
       search.length && cate.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  // const handleKeyPress = async (
-  //   event: React.KeyboardEvent<HTMLInputElement>
-  // ) => {
-  //   if (event.key === "Enter") {
-  //     const query = (event.target as HTMLInputElement).value.trim();
-
-  //     if (!query) {
-  //       console.error("Invalid query:", query);
-  //       return;
-  //     }
-
-  //     setLoading(true);
-
-  //     try {
-  //       const encodedQuery = encodeURIComponent(query);
-  //       const endpoint =
-  //         searchType === "users"
-  //           ? `http://localhost:3001/users/search?query=${encodedQuery}`
-  //           : `http://localhost:3001/posts/search?query=${encodedQuery}`;
-
-  //       const response = await fetch(endpoint, {
-  //         method: "GET",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       });
-
-  //       if (!response.ok) {
-  //         const statusText = response.statusText || "Unknown Error";
-  //         throw new Error(`Server returned ${response.status} ${statusText}`);
-  //       }
-
-  //       const data = await response.json();
-  //       console.log("Search results:", data);
-
-  //       // ส่งข้อมูลไปยังหน้าใหม่
-  //       navigate("/search", { state: { searchResult: data, searchType } });
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   }
-  // };
-
   const handleKeyPress = async (
     event: React.KeyboardEvent<HTMLInputElement>
   ) => {
     if (event.key === "Enter") {
       const query = (event.target as HTMLInputElement).value.trim();
-
-      if (!query) {
-        console.error("คำค้นหาห้ามเป็นค่าว่าง");
-        return; // ไม่ดำเนินการเรียก API หากคำค้นหาว่าง
-      }
-
+      if (!query) return;
       setLoading(true);
-
       try {
-        const posts = await searchPost(query);
-
-        console.log("ผลลัพธ์การค้นหา:", posts);
-
-        // นำทางไปยังหน้าแสดงผลการค้นหา
-        navigate("/search", {
-          state: { searchQuery: query },
-        });
+        await searchPost(query);
+        navigate("/search", { state: { searchQuery: query } });
       } catch (error) {
-        console.error("ข้อผิดพลาดในการดึงโพสต์:", error);
+        console.error("Error fetching posts:", error);
       } finally {
         setLoading(false);
       }
     }
-  };
-
-  const handleClickselectPost = () => {
-    setDropdownOpen(!dropdownOpen); // Toggle Dropdown visibility
-  };
-
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
   };
 
   const handleLogout = useCallback(() => {
@@ -197,22 +103,9 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
     navigate("/login");
   }, [navigate]);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        inputRef.current &&
-        !inputRef.current.contains(event.target as Node)
-      ) {
-        setShowDropdown(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  const toggleNotiMenu = () => {
+    setIsNotiOpen(!isNotiOpen);
+  };
 
   const handleNotificationClick = async (
     e: React.MouseEvent<HTMLAnchorElement>,
@@ -221,12 +114,10 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
     entityId: string
   ) => {
     e.preventDefault();
-
     try {
       await axios.patch(
         `http://localhost:3001/notifications/${notificationId}/mark-as-read`
       );
-
       setNotifications((prevNotifications) =>
         prevNotifications.map((notification) =>
           notification._id === notificationId
@@ -234,39 +125,76 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
             : notification
         )
       );
-
-      if (type == "follow") {
-        navigate(`/profile/${entityId}`);
-      } else {
-        navigate(`/content/${entityId}`);
-      }
+      navigate(
+        type === "follow" ? `/profile/${entityId}` : `/content/${entityId}`
+      );
     } catch (error) {
       console.error("Failed to mark notification as read:", error);
     }
   };
 
-  const toggleNotiMenu = () => {
-    setIsNotiOpen(!isNotiOpen);
-    setIsOpen(false);
-  };
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3001/notifications?userId=${userId}`
+        );
+        setNotifications(response.data);
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      }
+    };
 
-  const NotificationIcon = ({ notificationCount }: any) => {
+    fetchNotifications();
+
+    const intervalId = setInterval(fetchNotifications, 5000);
+    return () => clearInterval(intervalId);
+  }, [userId]);
+
+  const NotificationIcon = () => {
+    const unreadCount = useMemo(
+      () => notifications.filter((notification) => !notification.isRead).length,
+      [notifications]
+    );
+
     return (
       <div
         style={{ position: "relative", display: "inline-block" }}
         onClick={toggleNotiMenu}
       >
         <IoNotificationsOutline size={24} />
-        {notificationCount > 0 && (
-          <span className="notification-badge">{notificationCount}</span>
+        {unreadCount > 0 && (
+          <span className="notification-badge">{unreadCount}</span>
         )}
+        <Dropdown show={isNotiOpen} onToggle={() => setIsNotiOpen(!isNotiOpen)}>
+          <Dropdown.Menu style={{ right: "-40px", top: "8px" }}>
+            {notifications.map((notification) => {
+              return (
+                <Dropdown.Item key={notification._id} href="#">
+                  <div className="d-flex">
+                    <FaUser style={{ fontSize: "20px", marginRight: "15px" }} />
+                    <p
+                      className="m-0"
+                      onClick={(e: any) =>
+                        handleNotificationClick(
+                          e,
+                          notification.type,
+                          notification._id,
+                          notification.entity
+                        )
+                      }
+                    >
+                      {notification.message}
+                    </p>
+                  </div>
+                </Dropdown.Item>
+              );
+            })}
+          </Dropdown.Menu>
+        </Dropdown>
       </div>
     );
   };
-
-  const unreadCount = useMemo(() => {
-    return notifications.filter((notification) => !notification.isRead).length;
-  }, [notifications]);
 
   return (
     <div className="navbarreal">
@@ -299,12 +227,8 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
               placeholder="Search..."
               type="text"
             />
-            <IoIosSearch
-              onClick={handleClick}
-              className={`uil uil-${showDropdown ? "multiply" : "search"}`}
-            />
+            <IoIosSearch onClick={toggleDropdown} />
           </div>
-
           <div className={`items ${showDropdown ? "open" : ""}`}>
             {filteredCate.length > 0 &&
               filteredCate.map((cate) => (
@@ -313,84 +237,9 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
                 </button>
               ))}
           </div>
-          <div>
-            <NotificationIcon notificationCount={unreadCount} />
-            {isNotiOpen && (
-              <div className="dropdown-itemnoti" style={{ padding: "1rem" }}>
-                <h2>Notifications</h2>
-                <ul>
-                  {notifications.map((notification, idx) => {
-                    const backgroundColor = notification.isRead
-                      ? "transparent"
-                      : "rgba(232, 232, 232, .8)";
-
-                    return (
-                      <li
-                        key={idx}
-                        style={{
-                          backgroundColor,
-                          borderRadius: "10px",
-                          marginBottom: "0.5rem",
-                          textAlign: "start",
-                          padding: "0.8rem",
-                        }}
-                      >
-                        <a
-                          onClick={(e) =>
-                            handleNotificationClick(
-                              e,
-                              notification.type,
-                              notification._id,
-                              notification.entity
-                            )
-                          }
-                        >
-                          {notification.type === "like" &&
-                            `${notification.message}`}
-                          {notification.type === "comment" &&
-                            `${notification.message}`}
-                          {notification.type === "follow" &&
-                            `${notification.message}`}
-                        </a>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            )}
-          </div>
-          <Notifications />
-
+          <NotificationIcon />
           <div className="user-profile-dropdown">
-            <PiUserCircleFill onClick={handleClickselectPost} />
-            {/* {isOpen && (
-              <div className="dropdown-item1">
-                <ul>
-                  <li>
-                    <FaUserAlt />
-                    <Link to={`/profile/${userId}`}>โปรไฟล์</Link>
-                  </li>
-                  <li>
-                    <IoMdSettings />
-                    <a href="#">ตั้งค่า</a>
-                  </li>
-                  <li>
-                    <IoIosStats />
-                    <a href="#">สถิติ</a>
-                  </li>
-                  <li>
-                    <IoIosHelpCircleOutline />
-                    <a href="#">ช่วยเหลือ</a>
-                  </li>
-                  <li>
-                    <IoLogOutOutline />
-                    <a href="#" onClick={handleLogout}>
-                      ออกจากระบบ
-                    </a>
-                  </li>
-                </ul>
-              </div> */}
-
+            <PiUserCircleFill onClick={toggleDropdown} />
             <Dropdown
               show={dropdownOpen}
               onToggle={() => setDropdownOpen(false)}
@@ -420,16 +269,14 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
                 </Dropdown.Item>
                 <Dropdown.Item href="#/action-4">
                   <div className="d-flex">
-                    <div className="d-flex">
-                      <IoIosHelpCircleOutline
-                        style={{ fontSize: "20px", marginRight: "15px" }}
-                      />
-                      <p className="m-0">ช่วยเหลือ</p>
-                    </div>
+                    <IoIosHelpCircleOutline
+                      style={{ fontSize: "20px", marginRight: "15px" }}
+                    />
+                    <p className="m-0">ช่วยเหลือ</p>
                   </div>
                 </Dropdown.Item>
-                <Dropdown.Item>
-                  <div className="d-flex" onClick={handleLogout}>
+                <Dropdown.Item onClick={handleLogout}>
+                  <div className="d-flex">
                     <IoLogOutOutline
                       style={{ fontSize: "20px", marginRight: "15px" }}
                     />
@@ -438,9 +285,7 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
-            {/* )} */}
           </div>
-
           <div className="bx bx-menu" id="menu-icon">
             <RxHamburgerMenu />
           </div>
