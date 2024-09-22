@@ -3,6 +3,7 @@ const router = express.Router();
 const Post = require("../models/post");
 const Comment = require("../models/comment");
 const Like = require("../models/like");
+const Notification = require("../models/notification");
 const SavedPost = require("../models/save");
 const auth = require("./authMiddleware");
 const mongoose = require("mongoose");
@@ -182,33 +183,131 @@ router.delete("/:id", auth, getPost, async (req, res) => {
 });
 
 // เพิ่มหรือลบไลค์
+// router.post("/:id/likes", async (req, res) => {
+//   const postId = req.params.id;
+//   const { userId } = req.body;
+
+//   try {
+//     const post = await Post.findById(postId);
+//     const user = await User.findById(userId);
+
+//     if (!post || !user) {
+//       return res.status(404).json({ message: "Post or User not found" });
+//     }
+
+//     const existingLike = await Like.findOne({ post: postId, user: userId });
+
+//     if (existingLike) {
+//       await Like.deleteOne({ _id: existingLike._id });
+//       post.likes = post.likes.filter(
+//         (likeId) => !likeId.equals(existingLike._id)
+//       );
+//       await post.save();
+
+//       await Notification.deleteOne({
+//         user: post.user,
+//         entity: postId,
+//         type: "like",
+//         entityModel: "Post",
+//       });
+
+//       res.status(200).json({ message: "Post disliked", post });
+//     } else {
+//       const like = new Like({ user: userId, post: postId });
+//       await like.save();
+
+//       post.likes.push(like._id);
+//       await post.save();
+
+//       const existingNotification = await Notification.findOne({
+//         user: post.user,
+//         entity: postId,
+//         type: "like",
+//         entityModel: "Post",
+//       });
+
+//       if (!existingNotification) {
+//         const notification = new Notification({
+//           user: post.user,
+//           type: "like",
+//           message: `${user.firstname} ${user.lastname || ""} liked your post.`,
+//           entity: post._id,
+//           entityModel: "Post",
+//         });
+//         await notification.save();
+//       }
+
+//       res.status(200).json({ message: "Post liked", post, like: like._id });
+//     }
+//   } catch (error) {
+//     console.error("Error liking/disliking post:", error);
+//     res
+//       .status(500)
+//       .json({ message: "Error liking/disliking post: " + error.message });
+//   }
+// });
+
 router.post("/:id/likes", async (req, res) => {
   const postId = req.params.id;
   const { userId } = req.body;
 
   try {
     const post = await Post.findById(postId);
-    if (!post) {
-      return res.status(404).json({ message: "Post not found" });
+    const user = await User.findById(userId);
+
+    if (!post || !user) {
+      return res.status(404).json({ message: "Post or User not found" });
     }
 
-    const existingLike = await Like.findOne({ user: userId, post: postId });
+    const existingLike = await Like.findOne({ post: postId, user: userId });
+
     if (existingLike) {
       await Like.deleteOne({ _id: existingLike._id });
-      post.likes.pull(existingLike._id);
+      post.likes = post.likes.filter(
+        (likeId) => !likeId.equals(existingLike._id)
+      );
       await post.save();
-      return res.status(200).json({ message: "Like removed successfully" });
-    }
 
-    const like = new Like({ user: userId, post: postId });
-    const savedLike = await like.save();
-    post.likes.push(savedLike._id);
-    await post.save();
+      await Notification.deleteOne({
+        user: post.user,
+        entity: postId,
+        type: "like",
+        entityModel: "Post",
+      });
+
+      res.status(200).json({ message: "Post disliked", post });
+    } else {
+      const like = new Like({ user: userId, post: postId });
+      await like.save();
+
+      post.likes.push(like._id);
+      await post.save();
+
+      const existingNotification = await Notification.findOne({
+        user: post.user,
+        entity: postId,
+        type: "like",
+        entityModel: "Post",
+      });
+
+      if (!existingNotification) {
+        const notification = new Notification({
+          user: post.user,
+          type: "like",
+          message: `${user.firstname} ${user.lastname || ""} liked your post.`,
+          entity: post._id,
+          entityModel: "Post",
+        });
+        await notification.save();
+      }
+
+      res.status(200).json({ message: "Post liked", post, like: like._id });
+    }
+  } catch (error) {
+    console.error("Error liking/disliking post:", error);
     res
-      .status(201)
-      .json({ message: "Like created successfully", like: savedLike });
-  } catch (err) {
-    res.status(500).json({ message: "Error handling like: " + err.message });
+      .status(500)
+      .json({ message: "Error liking/disliking post: " + error.message });
   }
 });
 
@@ -218,20 +317,46 @@ router.post("/:id/comment", async (req, res) => {
   const { content, author } = req.body;
 
   try {
-    const post = await Post.findById(postId);
-    if (!post) {
-      return res.status(404).json({ message: "Post not found" });
+    const post = await Post.findById(postId).populate("user");
+    const user = await User.findById(author);
+
+    if (!post || !user) {
+      return res.status(404).json({ message: "Post or User not found" });
     }
 
     const comment = new Comment({ content, author, post: postId });
-    const savedComment = await comment.save();
-    post.comments.push(savedComment._id);
+    await comment.save();
+
+    post.comments.push(comment._id);
     await post.save();
 
-    res
-      .status(201)
-      .json({ message: "Comment created successfully", comment: savedComment });
+    const existingNotification = await Notification.findOne({
+      user: post.user._id,
+      entity: postId,
+      type: "comment",
+      entityModel: "Post",
+    });
+
+    if (!existingNotification) {
+      const notification = new Notification({
+        user: post.user._id,
+        type: "comment",
+        message: `${user.firstname} ${
+          user.lastname || ""
+        } commented on your post.`,
+        entity: postId,
+        entityModel: "Post",
+      });
+      await notification.save();
+    }
+
+    res.status(201).json({
+      message: "Comment created successfully",
+      post,
+      comment: comment._id,
+    });
   } catch (err) {
+    console.error("Error creating comment:", err);
     res.status(500).json({ message: "Error creating comment: " + err.message });
   }
 });
@@ -336,42 +461,45 @@ router.post("/:postId/comment/:commentId/reply", auth, async (req, res) => {
 });
 
 // การลบการตอบกลับความคิดเห็น
-router.delete("/:postId/comment/:commentId/reply/:replyId", auth, async (req, res) => {
-  const { postId, commentId, replyId } = req.params;
+router.delete(
+  "/:postId/comment/:commentId/reply/:replyId",
+  auth,
+  async (req, res) => {
+    const { postId, commentId, replyId } = req.params;
 
-  try {
-    // ค้นหาโพสต์ที่มี postId
-    const post = await Post.findById(postId);
-    if (!post) {
-      return res.status(404).json({ message: "ไม่พบบล็อก" });
+    try {
+      // ค้นหาโพสต์ที่มี postId
+      const post = await Post.findById(postId);
+      if (!post) {
+        return res.status(404).json({ message: "ไม่พบบล็อก" });
+      }
+
+      // ค้นหาคอมเมนต์ที่มี commentId
+      const comment = await Comment.findById(commentId);
+      if (!comment) {
+        return res.status(404).json({ message: "ไม่พบความคิดเห็น" });
+      }
+
+      // กรองการตอบกลับที่ต้องการลบออกจาก replies ของคอมเมนต์นี้
+      comment.replies = comment.replies.filter(
+        (reply) => reply._id.toString() !== replyId
+      );
+
+      // บันทึกคอมเมนต์ที่อัปเดต
+      await comment.save();
+
+      res.status(200).json({
+        message: "ลบการตอบกลับสำเร็จ",
+        updatedComment: comment,
+      });
+    } catch (err) {
+      console.error("ข้อผิดพลาดในการลบการตอบกลับความคิดเห็น: ", err);
+      res.status(500).json({
+        message: "ข้อผิดพลาดในการลบการตอบกลับความคิดเห็น: " + err.message,
+      });
     }
-
-    // ค้นหาคอมเมนต์ที่มี commentId
-    const comment = await Comment.findById(commentId);
-    if (!comment) {
-      return res.status(404).json({ message: "ไม่พบความคิดเห็น" });
-    }
-
-    // กรองการตอบกลับที่ต้องการลบออกจาก replies ของคอมเมนต์นี้
-    comment.replies = comment.replies.filter(
-      (reply) => reply._id.toString() !== replyId
-    );
-
-    // บันทึกคอมเมนต์ที่อัปเดต
-    await comment.save();
-
-    res.status(200).json({
-      message: "ลบการตอบกลับสำเร็จ",
-      updatedComment: comment,
-    });
-  } catch (err) {
-    console.error("ข้อผิดพลาดในการลบการตอบกลับความคิดเห็น: ", err);
-    res
-      .status(500)
-      .json({ message: "ข้อผิดพลาดในการลบการตอบกลับความคิดเห็น: " + err.message });
   }
-});
-
+);
 
 // ดึงข้อมูลโพสต์ที่ถูกใจตาม User ID
 router.get("/likedPosts/:userId", async (req, res) => {

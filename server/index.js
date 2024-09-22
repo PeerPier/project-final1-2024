@@ -81,6 +81,7 @@ const messageRouter = require("./routes/message");
 const find = require("./routes/find");
 const resetPasswordRouter = require("./routes/resetPassword");
 const FollowUser = require("./routes/follow");
+const Notification = require("./routes/notifications");
 
 app.use("/register", registerRouter);
 app.use("/login", loginRouter);
@@ -92,6 +93,7 @@ app.use("/messages", messageRouter);
 app.use("/users", find);
 app.use("/reset_password", resetPasswordRouter);
 app.use("/follow", FollowUser);
+app.use("/notification", Notification);
 
 app.use("/admin", AdminProfile);
 app.use("/admin/register", AdminRegister);

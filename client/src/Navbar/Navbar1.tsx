@@ -4,6 +4,7 @@ import React, {
   useRef,
   useCallback,
   ReactNode,
+  useMemo,
 } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../Navbar/navbar1.css";
@@ -11,13 +12,13 @@ import logoKKU from "../pic/logo-head.jpg";
 import { IoIosSearch } from "react-icons/io";
 import { PiUserCircleFill } from "react-icons/pi";
 import { RxHamburgerMenu } from "react-icons/rx";
-import { FaUserAlt } from "react-icons/fa";
+import axios from "axios";
 import {
   IoMdSettings,
   IoIosStats,
   IoIosHelpCircleOutline,
 } from "react-icons/io";
-import { IoLogOutOutline } from "react-icons/io5";
+import { IoLogOutOutline, IoNotificationsOutline } from "react-icons/io5";
 import { getPosts } from "../api/post";
 import { Post } from "../types/post";
 import Notifications from "./chat/Notification";
@@ -44,6 +45,8 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isNotiOpen, setIsNotiOpen] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -211,6 +214,60 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
     };
   }, []);
 
+  const handleNotificationClick = async (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    type: string,
+    notificationId: string,
+    entityId: string
+  ) => {
+    e.preventDefault();
+
+    try {
+      await axios.patch(
+        `http://localhost:3001/notifications/${notificationId}/mark-as-read`
+      );
+
+      setNotifications((prevNotifications) =>
+        prevNotifications.map((notification) =>
+          notification._id === notificationId
+            ? { ...notification, isRead: true }
+            : notification
+        )
+      );
+
+      if (type == "follow") {
+        navigate(`/profile/${entityId}`);
+      } else {
+        navigate(`/content/${entityId}`);
+      }
+    } catch (error) {
+      console.error("Failed to mark notification as read:", error);
+    }
+  };
+
+  const toggleNotiMenu = () => {
+    setIsNotiOpen(!isNotiOpen);
+    setIsOpen(false);
+  };
+
+  const NotificationIcon = ({ notificationCount }: any) => {
+    return (
+      <div
+        style={{ position: "relative", display: "inline-block" }}
+        onClick={toggleNotiMenu}
+      >
+        <IoNotificationsOutline size={24} />
+        {notificationCount > 0 && (
+          <span className="notification-badge">{notificationCount}</span>
+        )}
+      </div>
+    );
+  };
+
+  const unreadCount = useMemo(() => {
+    return notifications.filter((notification) => !notification.isRead).length;
+  }, [notifications]);
+
   return (
     <div className="navbarreal">
       <div className="headerr d-flex">
@@ -247,6 +304,7 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
               className={`uil uil-${showDropdown ? "multiply" : "search"}`}
             />
           </div>
+
           <div className={`items ${showDropdown ? "open" : ""}`}>
             {filteredCate.length > 0 &&
               filteredCate.map((cate) => (
@@ -255,7 +313,52 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
                 </button>
               ))}
           </div>
+          <div>
+            <NotificationIcon notificationCount={unreadCount} />
+            {isNotiOpen && (
+              <div className="dropdown-itemnoti" style={{ padding: "1rem" }}>
+                <h2>Notifications</h2>
+                <ul>
+                  {notifications.map((notification, idx) => {
+                    const backgroundColor = notification.isRead
+                      ? "transparent"
+                      : "rgba(232, 232, 232, .8)";
 
+                    return (
+                      <li
+                        key={idx}
+                        style={{
+                          backgroundColor,
+                          borderRadius: "10px",
+                          marginBottom: "0.5rem",
+                          textAlign: "start",
+                          padding: "0.8rem",
+                        }}
+                      >
+                        <a
+                          onClick={(e) =>
+                            handleNotificationClick(
+                              e,
+                              notification.type,
+                              notification._id,
+                              notification.entity
+                            )
+                          }
+                        >
+                          {notification.type === "like" &&
+                            `${notification.message}`}
+                          {notification.type === "comment" &&
+                            `${notification.message}`}
+                          {notification.type === "follow" &&
+                            `${notification.message}`}
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
+          </div>
           <Notifications />
 
           <div className="user-profile-dropdown">

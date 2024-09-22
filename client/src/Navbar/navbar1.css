@@ -213,6 +213,22 @@ h4.card-title {
   font-weight: 600;
 }
 
+.notification-badge {
+  position: absolute;
+  top: -8px;
+  left: 12px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
 @media (max-width: 890px) {
   .headerr {
     padding: 20px 3%;

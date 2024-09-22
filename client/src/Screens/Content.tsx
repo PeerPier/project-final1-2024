@@ -235,10 +235,17 @@ const Content = () => {
     return gf.trending({ offset, limit: 10 });
   };
 
+  // const handleLike = async () => {
+  //   try {
+  //     await likePost(id as string);
+  //     navigate(0);
+  //   } catch (error) {}
+  // };
   const handleLike = async () => {
     try {
       await likePost(id as string);
-      navigate(0);
+      const res = await getPostById(id as string);
+      setPost(res);
     } catch (error) {}
   };
 

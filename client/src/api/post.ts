@@ -1,3 +1,4 @@
+import axios from "axios";
 import { Post } from "../types/post";
 import Cookies from "js-cookie";
 
@@ -69,24 +70,53 @@ const editPost = async (id: string, post: any): Promise<any> => {
   }
 };
 
+// const addComment = async (id: string, content: string): Promise<void> => {
+//   const url = `${API_BASE_URL}/posts/${id}/comment`;
+
+//   const userId = localStorage.getItem("userId"); // ดึงค่า userId เป็นสตริง
+
+//   if (!userId) {
+//     throw new Error("User is not logged in.");
+//   }
+
+//   try {
+//     const response = await fetch(url, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({
+//         author: userId,
+//         content,
+//       }),
+//     });
+
+//     if (!response.ok) {
+//       throw new Error(
+//         `Server returned ${response.status} ${response.statusText}`
+//       );
+//     }
+//   } catch (error: any) {
+//     console.error("Error:", error.message);
+//     throw error;
+//   }
+// };
+
 const addComment = async (id: string, content: string): Promise<void> => {
   const url = `${API_BASE_URL}/posts/${id}/comment`;
+  const userId = localStorage.getItem("userId");
 
-  const userId = localStorage.getItem("userId"); // ดึงค่า userId เป็นสตริง
+  if (!userId) {
+    throw new Error("User is not logged in.");
+  }
 
   try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        author: userId,
-        content,
-      }),
+    const response = await axios.post(url, {
+      author: userId,
+      content,
     });
 
-    if (!response.ok) {
+    if (response.status !== 201) {
       throw new Error(
         `Server returned ${response.status} ${response.statusText}`
       );
@@ -223,18 +253,17 @@ const deleteReply = async (postId: any, commentId: any, replyId: any) => {
 
 const likePost = async (id: string): Promise<void> => {
   const url = `${API_BASE_URL}/posts/${id}/likes`;
+  const userId = localStorage.getItem("userId");
 
-  const userId = localStorage.getItem("userId"); // ดึงค่า userId เป็นสตริง
-
+  console.log("url", url);
+  console.log("user", userId);
   try {
     const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        userId,
-      }),
+      body: JSON.stringify({ userId }),
     });
 
     if (!response.ok) {
