@@ -1,0 +1,191 @@
+#navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+  width: 100%;
+  padding: 0 20px;
+  z-index: 2;
+}
+
+#navbar .linka a {
+  text-decoration: none;
+  color: white;
+}
+#navbar a:hover {
+  color: #e4bdc5;
+}
+
+#navbar .head1 h1 {
+  padding-left: 5rem;
+  color: white;
+  font-size: 30px;
+  margin: 0;
+}
+
+#navbar .head1 h2 {
+  color: white;
+  padding-left: 5rem;
+  font-size: 20px;
+  margin: 0;
+}
+.head1 {
+  flex: 1;
+}
+.linka {
+  width: 220px;
+  display: flex;
+  justify-content: center;
+}
+.linka a {
+  font-size: 18px;
+  font-weight: bold;
+  padding: 5px;
+}
+.container {
+  max-width: 700px;
+}
+.container h1 {
+  position: relative;
+  bottom: 300px;
+  position: fixed;
+  font-weight: bold;
+  font-size: 50px;
+  color: white;
+  padding: 1em 0 0 0;
+  margin-left: 10rem;
+  width: 800px; /* ปรับขนาดสูงสุดของข้อความ */
+}
+.imagestart {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 30vw; /* ความกว้างของ imagestart เป็น 30% ของ viewport width */
+  height: 30vh; /* ความสูงของ imagestart เป็น 30% ของ viewport height */
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.start1 {
+  position: absolute;
+  border-radius: 400px 400px 0 0;
+  width: 80%; /* กำหนดความกว้างสำหรับ start1 */
+  max-width: 500px; /* ปรับขนาดสูงสุดของ start1 */
+  height: auto; /* ปรับความสูงอัตโนมัติ */
+}
+
+.start2 {
+  position: absolute;
+  border-radius: 400px 400px 0 0;
+  width: 80%; /* กำหนดความกว้างสำหรับ start2 */
+  max-width: 400px; /* ปรับขนาดสูงสุดของ start2 */
+  height: auto; /* ปรับความสูงอัตโนมัติ */
+  right: 150px;
+}
+
+.burger-menu {
+  display: none;
+}
+
+.btn2 {
+  position: absolute;
+  bottom: 150px;
+  left: 160px;
+  padding: 20px;
+  border-radius: 20px;
+  font-size: 20px;
+  background: white;
+  color: #344268;
+}
+@media screen and (width <= 768px) {
+  .start1,
+  .start2 {
+    width: 60%;
+    max-width: 100%;
+    height: auto;
+    order: initial;
+    margin: 0;
+    padding: 0;
+  }
+
+  button {
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  #navbar .linka {
+    display: none;
+  }
+
+  .burger-menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1em;
+  }
+
+  .burger-icon {
+    width: 30px;
+    height: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+  }
+
+  .bar {
+    width: 100%;
+    height: 3px;
+    background-color: white;
+    border-radius: 3px;
+  }
+
+  .menu-links {
+    display: none;
+    flex-direction: column;
+    background-color: white;
+    padding: 1em;
+    border-radius: 10px;
+    position: absolute;
+    top: 60px;
+    right: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  #burger-checkbox:checked + .menu-links {
+    display: flex;
+  }
+
+  .menu-links a {
+    text-decoration: none;
+    color: black;
+    padding: 0.5em 0;
+    text-align: center;
+  }
+
+  #burger-checkbox {
+    display: none;
+  }
+  .container h1 {
+    text-align: center;
+    font-size: 5vw;
+    padding: 1em 0;
+    width: 90%;
+    margin: 0 auto;
+  }
+  .imagestart {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 50%;
+    height: 30vh;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
+}

@@ -1,0 +1,56 @@
+.follow-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.follow-icon > svg {
+  width: 25px;
+  height: 30px;
+  margin-right: 10px;
+  padding: 0;
+}
+.bar-icon {
+  border-left: 1px solid black;
+  margin: 0 10px 0 10px;
+}
+.follow-icon > h3 {
+  margin: 0;
+}
+.follow {
+  display: flex;
+  justify-content: center;
+}
+.nav-underline .nav-link {
+  display: flex;
+  justify-content: center;
+}
+.blog-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+  padding: 2% 10%;
+}
+
+.nav-item > a > svg {
+  margin-right: 10px;
+}
+
+.nav-item > a > p {
+  margin: 0;
+}
+
+.nav-item > a {
+  display: flex;
+  align-items: center;
+}
+
+.nav-item > a {
+  color: #000; /* สีของข้อความ */
+}
+
+.nav-underline .nav-link.active {
+  color: #cb6ce6 !important;
+}
+.nav-item > a:hover {
+  color: #555; /* สีของข้อความเมื่อ hover */
+}
