@@ -103,7 +103,10 @@ const editPost = async (id: string, post: any): Promise<any> => {
 // };
 
 const addComment = async (id: string, content: string): Promise<void> => {
+  console.log("id", id);
+  console.log("content", content);
   const url = `${API_BASE_URL}/posts/${id}/comment`;
+  console.log("url", url);
   const userId = localStorage.getItem("userId");
 
   if (!userId) {
@@ -254,9 +257,6 @@ const deleteReply = async (postId: any, commentId: any, replyId: any) => {
 const likePost = async (id: string): Promise<void> => {
   const url = `${API_BASE_URL}/posts/${id}/likes`;
   const userId = localStorage.getItem("userId");
-
-  console.log("url", url);
-  console.log("user", userId);
   try {
     const response = await fetch(url, {
       method: "POST",

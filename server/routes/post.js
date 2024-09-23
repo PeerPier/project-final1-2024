@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const User = require("../models/user");
 const Post = require("../models/post");
 const Comment = require("../models/comment");
 const Like = require("../models/like");
@@ -314,6 +315,7 @@ router.post("/:id/likes", async (req, res) => {
 // เพิ่มคอมเมนต์
 router.post("/:id/comment", async (req, res) => {
   const postId = req.params.id;
+  console.log("postId", postId);
   const { content, author } = req.body;
 
   try {
@@ -330,25 +332,16 @@ router.post("/:id/comment", async (req, res) => {
     post.comments.push(comment._id);
     await post.save();
 
-    const existingNotification = await Notification.findOne({
+    const notification = new Notification({
       user: post.user._id,
-      entity: postId,
       type: "comment",
+      message: `${user.firstname} ${
+        user.lastname || ""
+      } commented on your post.`,
+      entity: postId,
       entityModel: "Post",
     });
-
-    if (!existingNotification) {
-      const notification = new Notification({
-        user: post.user._id,
-        type: "comment",
-        message: `${user.firstname} ${
-          user.lastname || ""
-        } commented on your post.`,
-        entity: postId,
-        entityModel: "Post",
-      });
-      await notification.save();
-    }
+    await notification.save();
 
     res.status(201).json({
       message: "Comment created successfully",
@@ -433,30 +426,44 @@ router.post("/:postId/comment/:commentId/reply", auth, async (req, res) => {
   }
 
   try {
-    const post = await Post.findById(postId);
-    if (!post) {
-      return res.status(404).json({ message: "ไม่พบบล็อก" });
+    const post = await Post.findById(postId).populate("user");
+    const user = await User.findById(author);
+    const comment = await Comment.findById(commentId).populate("author");
+
+    if (!post || !comment || !user) {
+      return res
+        .status(404)
+        .json({ message: "Post, Comment, or User not found" });
     }
 
-    const comment = await Comment.findById(commentId);
-    if (!comment) {
-      return res.status(404).json({ message: "ไม่พบความคิดเห็น" });
-    }
+    console.log("user._id", user._id);
+    console.log("comment.author._id", comment.author._id);
 
-    //สร้างการตอบกลับ
     const reply = { content, author, created_at: new Date() };
-
     const updateComment = await addReplyComment(commentId, reply);
 
+    if (!user._id.equals(comment.author._id)) {
+      const notification = new Notification({
+        user: comment.author._id,
+        type: "reply",
+        message: `${user.firstname} ${
+          user.lastname || ""
+        } replied to your comment.`,
+        entity: postId,
+        entityModel: "Comment",
+      });
+      await notification.save();
+    }
+
     res.status(201).json({
-      message: "ตอบกลับสำเร็จ",
+      message: "Reply and notification created successfully",
       updateComment,
     });
   } catch (err) {
-    console.error("ข้อผิดพลาดในการตอบกลับความคิดเห็น: ", err);
-    res
-      .status(500)
-      .json({ message: "ข้อผิดพลาดในการตอบกลับความคิดเห็น: " + err.message });
+    console.error("Error creating reply or notification: ", err);
+    res.status(500).json({
+      message: "Error creating reply or notification: " + err.message,
+    });
   }
 });
 

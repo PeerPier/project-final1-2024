@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
   try {
     const notifications = await Notification.find({ user: userId })
       .populate("user", "username email firstname lastname profile_picture")
-      .sort({ created_at: -1 });
+      .sort({ updatedAt: -1 });
 
     res.json(notifications);
   } catch (error) {

@@ -10,12 +10,7 @@ const notificationSchema = new mongoose.Schema(
     entityModel: { type: String, required: true },
     isRead: { type: Boolean, default: false },
   },
-  { timestamps: true }
-);
-
-notificationSchema.index(
-  { user: 1, entity: 1, type: 1, entityModel: 1 },
-  { unique: true }
+  { timestamps: { type: Date, default: Date.now } }
 );
 
 module.exports = mongoose.model("Notification", notificationSchema);

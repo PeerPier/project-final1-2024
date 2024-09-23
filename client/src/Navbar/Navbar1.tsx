@@ -283,7 +283,18 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
             {notifications.map((notification) => {
               return (
                 <Dropdown.Item key={notification._id} href="#">
-                  <div className="d-flex">
+                  <div
+                    className="d-flex"
+                    style={
+                      notification.isRead
+                        ? { backgroundColor: "transparent" }
+                        : {
+                            backgroundColor: "rgba(183, 183, 183, .5)",
+                            borderRadius: "10px",
+                            padding: "5px",
+                          }
+                    }
+                  >
                     <FaUser style={{ fontSize: "20px", marginRight: "15px" }} />
                     <p
                       className="m-0"

@@ -84,8 +84,9 @@ const Content = () => {
         : comment;
       await addComment(id as string, finalComment);
       setComment("");
-      setSelectedGif(null); // Reset selected GIF
-      navigate(0);
+      setSelectedGif(null);
+      const res = await getPostById(id as string);
+      setPost(res);
     } catch (error) {
       console.error(error);
     }
@@ -178,6 +179,10 @@ const Content = () => {
       const result = await Replycomment(postId, commentId, replyData);
       console.log("Reply posted successfully:", result);
 
+      // Re-fetch the updated post
+      const res = await getPostById(postId);
+      setPost(res);
+
       setReplyText(""); // ล้างช่องกรอกข้อความ
       setReplyToReplyingId(null); // ปิดกล่องตอบกลับ
     } catch (error) {
@@ -235,12 +240,6 @@ const Content = () => {
     return gf.trending({ offset, limit: 10 });
   };
 
-  // const handleLike = async () => {
-  //   try {
-  //     await likePost(id as string);
-  //     navigate(0);
-  //   } catch (error) {}
-  // };
   const handleLike = async () => {
     try {
       await likePost(id as string);
@@ -616,7 +615,6 @@ const Content = () => {
                                           onChange={handleReplyChange}
                                           placeholder="Write a reply..."
                                         />
-
                                         <button
                                           onClick={() =>
                                             handleReplyToReplySubmit(
