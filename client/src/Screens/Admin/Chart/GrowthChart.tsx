@@ -25,11 +25,11 @@ const GrowthChart: React.FC<GrowthChartProps> = ({ data }) => {
         chartInstance.current = new Chart(ctx, {
           type: "line",
           data: {
-            labels: data.map((item) => item.month),
+            labels: data?.map((item) => item.month),
             datasets: [
               {
                 label: "ยอดการโพสต์ทั้งหมด",
-                data: data.map((item) => item.numberOfPosts),
+                data: data?.map((item) => item.numberOfPosts),
                 borderColor: "rgba(75, 192, 192, 1)",
                 borderWidth: 2,
               },

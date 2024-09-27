@@ -32,23 +32,6 @@ router.get("/search", async (req, res) => {
   }
 });
 
-// router.get("/search", async (req, res) => {
-//   const query = req.query.query;
-//   if (!query || typeof query !== "string") {
-//     return res
-//       .status(400)
-//       .json({ message: "Query parameter is missing or not a string" });
-//   }
-
-//   try {
-//     const posts = await Post.find({ $text: { $search: query } });
-//     res.json(posts);
-//   } catch (error) {
-//     console.error("Error fetching posts:", error);
-//     res.status(500).json({ message: "Internal Server Error" });
-//   }
-// });
-
 router.post("/", async (req, res) => {
   const { user, topic, detail, category, image, contentWithImages } = req.body;
 
@@ -315,7 +298,6 @@ router.post("/:id/likes", async (req, res) => {
 // เพิ่มคอมเมนต์
 router.post("/:id/comment", async (req, res) => {
   const postId = req.params.id;
-  console.log("postId", postId);
   const { content, author } = req.body;
 
   try {
@@ -392,37 +374,35 @@ router.delete("/:postId/comment/delete/:commentId", auth, async (req, res) => {
 
 const addReplyComment = async (commentId, reply) => {
   try {
-    // ตรวจสอบการมีอยู่ของความคิดเห็น
     const comment = await Comment.findById(commentId);
     if (!comment) {
-      throw new Error("ไม่พบความคิดเห็น");
+      throw new Error("Comment not found");
     }
 
-    // ตรวจสอบว่า reply มีข้อมูลหรือไม่
-    if (!reply || !reply.content || !reply.author) {
-      throw new Error("ข้อมูลการตอบกลับไม่ถูกต้อง");
+    if (!reply || !reply.content || !reply.author || !reply.replyTo) {
+      throw new Error("Invalid reply data");
     }
 
-    // เพิ่มการตอบกลับ
     comment.replies.push(reply);
 
-    // บันทึกความคิดเห็นที่อัปเดต
     await comment.save();
 
     return comment;
   } catch (err) {
-    console.error("ข้อผิดพลาดในการเพิ่มการตอบกลับความคิดเห็น:", err.message);
-    throw new Error("ข้อผิดพลาดในการเพิ่มการตอบกลับความคิดเห็น");
+    console.error("Error adding reply comment:", err.message);
+    throw new Error("Error adding reply comment");
   }
 };
 
 //การตอบกลับความคิดเห็น
 router.post("/:postId/comment/:commentId/reply", auth, async (req, res) => {
   const { postId, commentId } = req.params;
-  const { content, author } = req.body;
+  const { content, author, replyTo } = req.body;
 
-  if (!content || !author) {
-    return res.status(400).json({ message: "Content and author are required" });
+  if (!content || !author || !replyTo) {
+    return res
+      .status(400)
+      .json({ message: "Content, author, and replyTo are required" });
   }
 
   try {
@@ -436,10 +416,13 @@ router.post("/:postId/comment/:commentId/reply", auth, async (req, res) => {
         .json({ message: "Post, Comment, or User not found" });
     }
 
-    console.log("user._id", user._id);
-    console.log("comment.author._id", comment.author._id);
+    const reply = {
+      content,
+      author,
+      created_at: new Date(),
+      replyTo, // This will now properly reference the User model
+    };
 
-    const reply = { content, author, created_at: new Date() };
     const updateComment = await addReplyComment(commentId, reply);
 
     if (!user._id.equals(comment.author._id)) {

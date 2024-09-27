@@ -1,5 +1,3 @@
-import { User } from "../types/user";
-
 const API_BASE_URL = "http://localhost:3001";
 
 export const fetchAdminProfile = async (id: string): Promise<any> => {
@@ -7,14 +5,20 @@ export const fetchAdminProfile = async (id: string): Promise<any> => {
     throw new Error("Invalid Admin ID");
   }
 
+  const token = localStorage.getItem("adminToken");
+  if (!token) {
+    console.error("No token found, redirecting to login...");
+    return null;
+  }
+
   const url = `${API_BASE_URL}/admin/${id}`;
-  console.log("Request URL:", url);
 
   try {
     const response = await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -48,7 +52,7 @@ export const fetchAdminProfile = async (id: string): Promise<any> => {
 
 // ฟังก์ชันสำหรับดึงข้อมูลผู้ใช้ทั้งหมดจาก backend
 export const fetchUsersAPI = async () => {
-  const token = localStorage.getItem("adminToken");
+  const token = localStorage.getItem("userId");
   if (!token) {
     console.error("No token found, redirecting to login...");
     return;
@@ -58,7 +62,7 @@ export const fetchUsersAPI = async () => {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`, // ส่ง token ใน header
+      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -70,8 +74,30 @@ export const fetchUsersAPI = async () => {
   return data;
 };
 
+export const fetchAllUser = async () => {
+  const token = localStorage.getItem("userId");
+  if (!token) {
+    console.error("No token found, redirecting to login...");
+    return;
+  }
+
+  const response = await fetch("http://localhost:3001/admin/viewer", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Failed to fetch users");
+  }
+
+  const data = await response.json();
+  return data;
+};
+
 export const deleteUserAPI = async (userId: string): Promise<void> => {
-  const adminToken = localStorage.getItem("adminToken"); // ดึง token จาก localStorage
+  const adminToken = localStorage.getItem("userId"); // ดึง token จาก localStorage
 
   if (!adminToken) {
     throw new Error("No admin token found. Unauthorized request.");
@@ -82,7 +108,7 @@ export const deleteUserAPI = async (userId: string): Promise<void> => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${adminToken}`, // ส่ง token ไปใน header
+        Authorization: `Bearer ${adminToken}`, // ส่ง token ไปใน header
       },
     });
 
@@ -94,4 +120,3 @@ export const deleteUserAPI = async (userId: string): Promise<void> => {
     throw error;
   }
 };
-

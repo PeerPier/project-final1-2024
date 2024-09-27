@@ -29,7 +29,6 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 
-// ตั้งค่า Multer สำหรับการอัปโหลดไฟล์
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = path.join(__dirname, "uploads");
@@ -52,9 +51,8 @@ app.post("/upload", upload.single("file"), (req, res) => {
   res.json({ imageUrl: `http://localhost:3001/uploads/${req.file.filename}` });
 });
 
-// เส้นทางสำหรับการอัปโหลดหลายไฟล์
 app.post("/uploads", upload.array("files"), (req, res) => {
-  console.log("Uploaded files:", req.files); // ตรวจสอบว่าไฟล์มาถึงเซิร์ฟเวอร์หรือไม่
+  console.log("Uploaded files:", req.files);
 
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({ message: "No files uploaded." });
@@ -66,7 +64,6 @@ app.post("/uploads", upload.array("files"), (req, res) => {
   res.json({ fileUrls });
 });
 
-// Middleware สำหรับเสิร์ฟไฟล์ที่อัปโหลด
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const registerRouter = require("./routes/register");
@@ -82,8 +79,9 @@ const find = require("./routes/find");
 const resetPasswordRouter = require("./routes/resetPassword");
 const FollowUser = require("./routes/follow");
 const notificationRouter = require("./routes/notifications");
-app.use("/notifications", notificationRouter);
+const questionRouter = require("./routes/QuestionRoutes");
 
+app.use("/notifications", notificationRouter);
 app.use("/register", registerRouter);
 app.use("/login", loginRouter);
 app.use("/profile", profileRouter);
@@ -94,10 +92,11 @@ app.use("/messages", messageRouter);
 app.use("/users", find);
 app.use("/reset_password", resetPasswordRouter);
 app.use("/follow", FollowUser);
-
 app.use("/admin", AdminProfile);
 app.use("/admin/register", AdminRegister);
+app.use("/api/questions", questionRouter);
 
+// Connect to MongoDB
 mongoose
   .connect(uri)
   .then(() => {

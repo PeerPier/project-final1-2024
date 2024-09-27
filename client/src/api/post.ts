@@ -103,10 +103,7 @@ const editPost = async (id: string, post: any): Promise<any> => {
 // };
 
 const addComment = async (id: string, content: string): Promise<void> => {
-  console.log("id", id);
-  console.log("content", content);
   const url = `${API_BASE_URL}/posts/${id}/comment`;
-  console.log("url", url);
   const userId = localStorage.getItem("userId");
 
   if (!userId) {
@@ -131,9 +128,9 @@ const addComment = async (id: string, content: string): Promise<void> => {
 };
 
 const Replycomment = async (
-  postId: string,
+  postId: string | undefined,
   commentId: string,
-  replyData: { content: string; author: string }
+  replyData: { content: string; author: string; replyTo: string }
 ) => {
   try {
     const token = Cookies.get("token");
@@ -170,7 +167,7 @@ export const ReplyToReply = async (
   postId: string,
   commentId: string,
   replyId: string,
-  replyData: { content: string; author: string }
+  replyData: { content: string; author: string; replyTo: string }
 ) => {
   const response = await fetch(
     `${API_BASE_URL}/posts/${postId}/comments/${commentId}/replies/${replyId}`,

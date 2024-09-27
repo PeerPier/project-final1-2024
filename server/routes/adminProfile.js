@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Admin = require("../models/admin");
 const User = require("../models/user");
+const Post = require("../models/post");
 const jwt = require("jsonwebtoken");
 
 //Admin
@@ -30,12 +31,16 @@ router.get("/", async (req, res) => {
 const isAdmin = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
+    console.log("token in server", token);
     if (!token) {
       return res.status(401).json({ message: "No token provided" });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const admin = await Admin.findById(decoded.id);
+    const admin = await User.findById(decoded.id);
+
+    console.log("Decoded: ", decoded);
+    console.log("Admin: ", admin);
 
     if (admin && admin.is_admin) {
       req.user = admin;
@@ -50,14 +55,55 @@ const isAdmin = async (req, res, next) => {
 };
 
 // 1. รับข้อมูลผู้ใช้ทั้งหมด (แอดมิน)
-router.get("/users", isAdmin, async (req, res) => {
+// router.get("/users", isAdmin, async (req, res) => {
+//   try {
+//     const userCount = await User.countDocuments();
+//     console.log("userCount", userCount); // This logs the count on the server-side
+//     res.json({ count: userCount });
+//   } catch (error) {
+//     res.status(500).json({ message: "Server error" });
+//   }
+// });
+
+// waiting for add isAdmin function //
+router.get("/users", async (req, res) => {
   try {
-    const users = await User.find();
-    res.json(users);
+    const now = new Date();
+
+    // for fetch data last 24 Hour
+    // const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    // const userCount = await User.countDocuments({
+    //   createdAt: { $gte: last24Hours },
+    // });
+
+    // for fetch all
+    const userCount = await User.countDocuments();
+
+    res.json(userCount);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 });
+
+router.get("/viewer", async (req, res) => {
+  try {
+    const now = new Date();
+
+    // for fetch data last 24 Hour
+    // const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    // const posts = await Post.find({ createdAt: { $gte: last24Hours } });
+
+    // for fetch all
+    const posts = await Post.find();
+
+    res.json(posts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+// waiting for add isAdmin function //
 
 // 2. รับข้อมูลผู้ใช้ตาม ID (แอดมิน)
 router.get("/users/:id", isAdmin, async (req, res) => {

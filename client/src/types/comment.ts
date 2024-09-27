@@ -4,6 +4,7 @@ export type ReplyComment = {
   _id: string;
   content: string;
   author: User;
+  replyTo: User;
   created_at: Date;
 };
 

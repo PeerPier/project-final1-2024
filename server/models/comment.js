@@ -13,6 +13,11 @@ const ReplyCommentScema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  replyTo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   created_at: {
     type: Date,
     default: Date.now,
@@ -42,5 +47,4 @@ const CommentSchema = new mongoose.Schema({
 });
 
 const Comment = mongoose.model("Comment", CommentSchema);
-
 module.exports = Comment;

@@ -109,7 +109,8 @@ const Content = () => {
     }
   };
 
-  const handleReplyClick = (commentId: string) => {
+  const handleReplyClick = (commentId: string, username: string) => {
+    console.log("commentId", commentId);
     setReplyingCommentId(replyingCommentId === commentId ? null : commentId);
   };
 
@@ -118,10 +119,11 @@ const Content = () => {
   };
 
   //ส่งความคิดเห็น
-  const handleReplySubmit = async (postId: string, commentId: string) => {
-    console.log("postId:", postId);
-    console.log("commentId:", commentId);
-
+  const handleReplySubmit = async (
+    postId: string,
+    commentId: string,
+    replyTo: string
+  ) => {
     if (!replyText.trim()) {
       alert("Please enter a reply.");
       return;
@@ -135,6 +137,7 @@ const Content = () => {
     const replyData = {
       content: replyText.trim(),
       author: userId,
+      replyTo: replyTo,
     };
 
     try {
@@ -150,7 +153,7 @@ const Content = () => {
   };
 
   // จัดการการแสดงความคิดเห็นตอบกลับ
-  const handleReplyToReplyClick = (replyId: string) => {
+  const handleReplyToReplyClick = (replyId: string, username: string) => {
     setReplyToReplyingId(replyToReplyingId === replyId ? null : replyId);
   };
 
@@ -158,7 +161,7 @@ const Content = () => {
   const handleReplyToReplySubmit = async (
     postId: string,
     commentId: string,
-    replyId: string
+    replyTo: string
   ) => {
     if (!replyText.trim()) {
       alert("Please enter a reply.");
@@ -173,18 +176,18 @@ const Content = () => {
     const replyData = {
       content: replyText.trim(),
       author: userId,
+      replyTo: replyTo,
     };
 
     try {
       const result = await Replycomment(postId, commentId, replyData);
       console.log("Reply posted successfully:", result);
 
-      // Re-fetch the updated post
       const res = await getPostById(postId);
       setPost(res);
 
-      setReplyText(""); // ล้างช่องกรอกข้อความ
-      setReplyToReplyingId(null); // ปิดกล่องตอบกลับ
+      setReplyText("");
+      setReplyToReplyingId(null);
     } catch (error) {
       console.error("Error posting reply:", error);
       alert("Failed to post reply. Please try again.");
@@ -343,15 +346,6 @@ const Content = () => {
           >
             <p style={{ fontSize: "16px" }}>{post.detail}</p>
           </div>
-
-          {/* {post.images && post.images.length > 0 && (
-            <div className="image-1">
-              {post.images.map((img, index) => (
-                <Image key={index} src={img} />
-              ))}
-            </div>
-          )} */}
-
           <Col>
             <div
               className="post-con"
@@ -460,7 +454,12 @@ const Content = () => {
                           </span>
                           <p
                             className="m-0"
-                            onClick={() => handleReplyClick(comment._id)}
+                            onClick={() => {
+                              handleReplyClick(
+                                comment._id,
+                                comment.author.username
+                              );
+                            }}
                           >
                             ตอบกลับ
                           </p>
@@ -504,7 +503,7 @@ const Content = () => {
                                     </span>
                                     <div className="comment-all">
                                       <div className="user-comment d-flex align-items-center justify-content-between">
-                                        <span>
+                                        <span className="reply-people">
                                           <a
                                             href={`/profile/${reply.author._id}`}
                                             style={{
@@ -515,6 +514,7 @@ const Content = () => {
                                             {reply.author.username}
                                           </a>
                                         </span>
+
                                         <div className="select-detail">
                                           <TfiMoreAlt
                                             onClick={(e) => {
@@ -557,10 +557,12 @@ const Content = () => {
                                       </div>
                                       <div className="reply-content">
                                         <a
-                                          href={`/profile/${post.user._id}`}
-                                          style={{ marginRight: "5px" }}
+                                          href={`/profile/${reply.author._id}`}
+                                          style={{
+                                            marginRight: "5px",
+                                          }}
                                         >
-                                          {comment.author.username}
+                                          {reply.author.username}
                                         </a>
                                         <span
                                           dangerouslySetInnerHTML={{
@@ -586,7 +588,10 @@ const Content = () => {
                                     <p
                                       className="m-0"
                                       onClick={() =>
-                                        handleReplyToReplyClick(reply._id)
+                                        handleReplyToReplyClick(
+                                          reply._id,
+                                          reply.author.username
+                                        )
                                       }
                                     >
                                       ตอบกลับ
@@ -616,13 +621,19 @@ const Content = () => {
                                           placeholder="Write a reply..."
                                         />
                                         <button
-                                          onClick={() =>
-                                            handleReplyToReplySubmit(
-                                              post._id,
-                                              comment._id,
-                                              reply._id
-                                            )
-                                          }
+                                          onClick={() => {
+                                            reply.author?._id === id
+                                              ? handleReplyToReplySubmit(
+                                                  post._id,
+                                                  comment._id,
+                                                  reply.author._id
+                                                )
+                                              : handleReplyToReplySubmit(
+                                                  post._id,
+                                                  comment._id,
+                                                  reply.author._id
+                                                );
+                                          }}
                                           className="send-icon1"
                                         >
                                           <IoIosSend />
@@ -663,7 +674,11 @@ const Content = () => {
                               />
                               <button
                                 onClick={() =>
-                                  handleReplySubmit(post._id, comment._id)
+                                  handleReplySubmit(
+                                    post._id,
+                                    comment._id,
+                                    post.user._id
+                                  )
                                 }
                                 className="send-icon1"
                               >

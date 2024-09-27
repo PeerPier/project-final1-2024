@@ -23,15 +23,8 @@ import { GoHeartFill } from "react-icons/go";
 import { IoStatsChart } from "react-icons/io5";
 import { IoBookmark } from "react-icons/io5";
 import { HiOutlinePlus } from "react-icons/hi2";
-import { Form } from "react-bootstrap";
 
-const radios = [
-  { name: "Newest", value: "1" },
-  { name: "Oldest", value: "2" },
-  { name: "Most Popular", value: "3" },
-];
-
-const Feeds = () => {
+const Category = () => {
   const navigate = useNavigate();
   const [feeds, setFeeds] = useState<Post[]>([]);
   const [sortedFeeds, setSortedFeeds] = useState<Post[]>([]);
@@ -199,88 +192,9 @@ const Feeds = () => {
     navigate(`/posts`);
   };
 
-  const [showReportModal, setShowReportModal] = useState(false);
-  const [reportPostId, setReportPostId] = useState<string | null>(null);
-  const [reportReason, setReportReason] = useState("");
-
-  const handleShowReportModal = (id: string) => {
-    setReportPostId(id);
-    setShowReportModal(true);
-  };
-
-  const handleCloseReportModal = () => {
-    setShowReportModal(false);
-    setReportPostId(null);
-    setReportReason("");
-  };
-
-  const handleReportPost = async () => {
-    if (reportPostId && reportReason) {
-      try {
-        console.log(
-          `Reported post ${reportPostId} with reason: ${reportReason}`
-        );
-        handleCloseReportModal();
-      } catch (error) {
-        console.error("Failed to report post:", error);
-      }
-    } else {
-      console.log("Please enter a reason for the report.");
-    }
-  };
-
   return (
     <div className="blogs">
       <section className="trending-post" id="trending">
-        <div className="center-text">
-          <h2>
-            Our Trending <span>Post</span>
-          </h2>
-          <div className="add-post">
-            <HiOutlinePlus
-              onClick={handleClickselectPost}
-              style={{ fontSize: "50px" }}
-            />
-
-            <Dropdown
-              show={dropdownOpen}
-              onToggle={() => setDropdownOpen(false)}
-            >
-              <Dropdown.Menu
-                style={{
-                  position: "fixed",
-                  bottom: "5.5rem",
-                  color: "#cb6ce6",
-                  right: "30px",
-                }}
-              >
-                <Dropdown.Item href="#/action-1" onClick={handleClickPost}>
-                  บล็อกทั่วไป
-                </Dropdown.Item>
-                <Dropdown.Item href="#/action-2">Action 2</Dropdown.Item>
-                <Dropdown.Item href="#/action-3">Action 3</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-          </div>
-        </div>
-        <div>
-          <ButtonGroup className="mb-2">
-            {radios.map((radio, idx) => (
-              <ToggleButton
-                key={idx}
-                id={`radio-${idx}`}
-                type="radio"
-                variant="secondary"
-                name="radio"
-                value={radio.value}
-                checked={radioValue === radio.value}
-                onChange={(e) => setRadioValue(e.currentTarget.value)}
-              >
-                {radio.name}
-              </ToggleButton>
-            ))}
-          </ButtonGroup>
-        </div>
         {loading ? (
           <div className="text-center mt-5">
             <Spinner animation="border" style={{ color: "#cb6ce6" }} />
@@ -322,11 +236,7 @@ const Feeds = () => {
                             </Dropdown.Item>
                           </>
                         )}
-                        <Dropdown.Item
-                          onClick={() => handleShowReportModal(feed._id)}
-                        >
-                          รายงานปัญหา
-                        </Dropdown.Item>
+                        <Dropdown.Item>ตั้งค่าความเป็นส่วนตัว</Dropdown.Item>
                       </Dropdown.Menu>
                     </Dropdown>
                   )}
@@ -425,81 +335,9 @@ const Feeds = () => {
             </Button>
           </Modal.Footer>
         </Modal>
-
-        {/* Report modal */}
-        <Modal show={showReportModal} onHide={handleCloseReportModal} centered>
-          <Modal.Header closeButton>
-            <Modal.Title>รายงานปัญหา</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form>
-              <Form.Group>
-                <Form.Check
-                  type="radio"
-                  label="เนื้อหาไม่เหมาะสม"
-                  name="reportReason"
-                  value="เนื้อหาไม่เหมาะสม"
-                  onChange={(e) => setReportReason(e.target.value)}
-                  checked={reportReason === "เนื้อหาไม่เหมาะสม"}
-                />
-                <Form.Check
-                  type="radio"
-                  label="เนื้อหามีการกลั่นแกล้งหรือคุกคาม"
-                  name="reportReason"
-                  value="เนื้อหามีการกลั่นแกล้งหรือคุกคาม"
-                  onChange={(e) => setReportReason(e.target.value)}
-                  checked={reportReason === "เนื้อหามีการกลั่นแกล้งหรือคุกคาม"}
-                />
-                <Form.Check
-                  type="radio"
-                  label="เนื้อหามีการขายหรือส่งเสริมสินค้าต้องห้าม"
-                  name="reportReason"
-                  value="เนื้อหามีการขายหรือส่งเสริมสินค้าต้องห้าม"
-                  onChange={(e) => setReportReason(e.target.value)}
-                  checked={
-                    reportReason === "เนื้อหามีการขายหรือส่งเสริมสินค้าต้องห้าม"
-                  }
-                />
-                <Form.Check
-                  type="radio"
-                  label="ข้อมูลเท็จ"
-                  name="reportReason"
-                  value="ข้อมูลเท็จ"
-                  onChange={(e) => setReportReason(e.target.value)}
-                  checked={reportReason === "ข้อมูลเท็จ"}
-                />
-                <Form.Check
-                  type="radio"
-                  label="การแอบอ้างบุคคลอื่น"
-                  name="reportReason"
-                  value="การแอบอ้างบุคคลอื่น"
-                  onChange={(e) => setReportReason(e.target.value)}
-                  checked={reportReason === "การแอบอ้างบุคคลอื่น"}
-                />
-                <Form.Check
-                  type="radio"
-                  label="สแปม"
-                  name="reportReason"
-                  value="สแปม"
-                  onChange={(e) => setReportReason(e.target.value)}
-                  checked={reportReason === "สแปม"}
-                />
-              </Form.Group>
-            </Form>
-          </Modal.Body>
-
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleCloseReportModal}>
-              ยกเลิก
-            </Button>
-            <Button variant="danger" onClick={handleReportPost}>
-              รายงานปัญหา
-            </Button>
-          </Modal.Footer>
-        </Modal>
       </section>
     </div>
   );
 };
 
-export default Feeds;
+export default Category;

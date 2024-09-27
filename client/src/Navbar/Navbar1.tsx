@@ -331,10 +331,10 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
             <a href="/">หน้าแรก</a>
           </li>
           <li>
-            <a href="#">ยอดนิยม</a>
+            <a href="/popular">ยอดนิยม</a>
           </li>
           <li>
-            <a href="#">หมวดหมู่</a>
+            <a href="category">หมวดหมู่</a>
           </li>
           <li>
             <a href="#">เกี่ยวกับเรา</a>

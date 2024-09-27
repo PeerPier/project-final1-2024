@@ -121,7 +121,6 @@ const Login: React.FC = () => {
       const contentType = response.headers.get("content-type");
       let responseData;
 
-      // Handle non-JSON response
       if (!contentType || !contentType.includes("application/json")) {
         responseData = await response.text();
       } else {
@@ -131,10 +130,10 @@ const Login: React.FC = () => {
       if (responseData.success) {
         if (responseData.id) {
           try {
-            localStorage.setItem("userId", responseData.id); // Store the user ID in local storage
-            setUserId(responseData.id); // Set user ID in the state
-            window.location.href = "/"; // Redirect to homepage
-            displayAlert("เข้าสู่ระบบสำเร็จ"); // Success message
+            localStorage.setItem("userId", responseData.id);
+            setUserId(responseData.id);
+            window.location.href = "/";
+            displayAlert("เข้าสู่ระบบสำเร็จ");
           } catch (storageError) {
             console.error(
               "Failed to save userId in localStorage",
@@ -147,31 +146,24 @@ const Login: React.FC = () => {
           displayAlert("Response does not contain ID");
         }
       } else {
-        displayAlert("อีเมลหรือรหัสผ่านไม่ถูกต้อง"); // Invalid credentials message
+        displayAlert("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
       }
     } catch (error: any) {
       console.error("Error:", error.message);
 
-      // Handle network and CORS errors
       if (error instanceof TypeError) {
         console.error("Network error or CORS issue");
         displayAlert("Network error or CORS issue. Please try again.");
-      }
-      // Handle JSON parsing errors
-      else if (error instanceof SyntaxError) {
+      } else if (error instanceof SyntaxError) {
         console.error("Error parsing JSON response");
         displayAlert("Error parsing server response. Please try again.");
-      }
-      // General error handler
-      else {
+      } else {
         displayAlert("โปรดลองอีกครั้ง");
       }
     }
   }, [email, password, displayAlert]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
     try {
       const user = {
         action: "register",
@@ -198,7 +190,6 @@ const Login: React.FC = () => {
 
       if (responseData.success) {
         displayAlert("ลงทะเบียนสำเร็จ!");
-        // Optionally handle redirect or additional actions after successful registration
       } else {
         displayAlert(responseData.message || "ลงทะเบียนไม่สำเร็จ");
       }
@@ -214,7 +205,11 @@ const Login: React.FC = () => {
         <div className="box">
           <div className="inner-box">
             <div className="forms-wrap">
-              <form autoComplete="off" className="sign-in-form">
+              <form
+                autoComplete="off"
+                className="sign-in-form"
+                onSubmit={(e) => e.preventDefault()}
+              >
                 <div className="logo">
                   <img src={logohead} alt="easyclass" />
                 </div>
@@ -253,12 +248,14 @@ const Login: React.FC = () => {
                     <label className="label-login">รหัสผ่าน</label>
                   </div>
 
-                  <input
-                    type="submit"
-                    value="เข้าสู่ระบบ"
+                  {/* Changed type to 'button' to prevent form submission */}
+                  <button
+                    type="button"
                     className="sign-btn"
                     onClick={handleLogin}
-                  />
+                  >
+                    เข้าสู่ระบบ
+                  </button>
 
                   <p className="text">
                     <Link to="/forgot-password">ลืมรหัสผ่าน</Link>{" "}

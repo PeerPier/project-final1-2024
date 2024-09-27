@@ -31,6 +31,8 @@ import { ChatContextProvider } from "./Screens/ChatContext";
 import Navbar2 from "./Navbar/Navbar1";
 import EditPost from "./Screens/edit-post";
 import SearchResults from "./Navbar/SearchResults ";
+import HelpCentre from "./Screens/helpcentre";
+import Popular from "./Screens/Popular";
 
 function NavbarLayout() {
   return (
@@ -61,8 +63,10 @@ function App() {
             <Route path="/sidebar" element={<Sidebar />} />
             <Route path="/st" element={<Settingtest />} />
             <Route path="/footer" element={<Footer />} />
+            <Route path="/helpcentre" element={<HelpCentre />} />
             <Route path="/content/:id" element={<Content />} />
             <Route path="/category" element={<Category />} />
+            <Route path="/popular" element={<Popular />} />
             <Route path="/search" element={<SearchResults />} />
           </Route>
 

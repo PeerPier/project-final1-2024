@@ -4,11 +4,15 @@ import React, { useState, useEffect } from "react";
 import logostart from "../../pic/logo-headV2.png";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { TiDocumentText } from "react-icons/ti";
-import {  RiDashboardFill } from "react-icons/ri";
+import { RiDashboardFill } from "react-icons/ri";
 import { IoIosHelpCircle, IoIosTime } from "react-icons/io";
 import { MdManageAccounts, MdCategory, MdOutlinePostAdd } from "react-icons/md";
 import { FiLogOut } from "react-icons/fi";
-import { fetchAdminProfile } from "../../api/adminProfile";
+import {
+  fetchAdminProfile,
+  fetchAllUser,
+  fetchUsersAPI,
+} from "../../api/adminProfile";
 import { LuView } from "react-icons/lu";
 import { PiUsersThreeFill } from "react-icons/pi";
 import { IoDocumentTextOutline } from "react-icons/io5";
@@ -19,23 +23,62 @@ import { RiUserStarFill } from "react-icons/ri";
 import Form from "react-bootstrap/Form";
 import ManageUser from "./manageUs";
 import GrowthChart from "./Chart/GrowthChart";
-import ManageQ from "./manageQ";
 import { IoNotifications } from "react-icons/io5";
 import { FaUserMinus } from "react-icons/fa6";
 import ManageCate from "./manageCate";
+import ManageQ from "./manageQ";
 
 const AdminHome: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [adminProfile, setAdminProfile] = useState<any>(null);
+
+  const [userCounter, setUserCounter] = useState<number>(0);
+  const [postCounter, setPostCounter] = useState<number>(0);
+  const [totalViews, setTotalViews] = useState<number>(0);
+  const [postMonthly, setPostMonthly] = useState<any>();
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [tel, setTel] = useState("");
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [selectedCate, setSelectedCate] = useState<string>("dashboard");
+
   const [selectedBlog, setSelectedBlog] = useState<string>("blog-all");
   const [selectedApprove, setSelectedApprove] =
     useState<string>("blog-success");
+
+  const convertPostsToGrowthData = (posts: any[]) => {
+    const monthNames = [
+      "มกราคม",
+      "กุมภาพันธ์",
+      "มีนาคม",
+      "เมษายน",
+      "พฤษภาคม",
+      "มิถุนายน",
+      "กรกฎาคม",
+      "สิงหาคม",
+      "กันยายน",
+      "ตุลาคม",
+      "พฤศจิกายน",
+      "ธันวาคม",
+    ];
+
+    const postCounts: { [key: number]: number } = {};
+
+    posts.forEach((post) => {
+      const date = new Date(post.createdAt);
+      const month = date.getMonth();
+      postCounts[month] = (postCounts[month] || 0) + 1;
+    });
+
+    const growthData = monthNames.map((monthName, index) => ({
+      month: monthName,
+      numberOfPosts: postCounts[index] || 0,
+    }));
+
+    return growthData;
+  };
 
   const growthData = [
     { month: "มกราคม", numberOfPosts: 20 },
@@ -76,7 +119,6 @@ const AdminHome: React.FC = () => {
       menuBtn.addEventListener("click", openMenuHandler);
       closeBtn.addEventListener("click", closeMenuHandler);
 
-      // Cleanup function
       return () => {
         themToggler.removeEventListener("click", changeTheme);
         menuBtn.removeEventListener("click", openMenuHandler);
@@ -104,6 +146,29 @@ const AdminHome: React.FC = () => {
 
     fetchData();
   }, [id]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const userCountData = await fetchUsersAPI();
+        const AllUser = await fetchAllUser();
+
+        const totalViews = AllUser.reduce(
+          (acc: any, post: any) => acc + post.views,
+          0
+        );
+
+        setUserCounter(userCountData);
+        setPostCounter(AllUser.length);
+        setTotalViews(totalViews);
+        setPostMonthly(convertPostsToGrowthData(AllUser));
+      } catch (error) {
+        console.error("Error fetching user count:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleCategorySelection = (category: string) => {
     setSelectedCate(category);
@@ -203,7 +268,7 @@ const AdminHome: React.FC = () => {
                 <div className="middle">
                   <div className="left">
                     <h3>ผู้ใช้ทั้งหมด</h3>
-                    <h1>256</h1>
+                    <h1>{userCounter}</h1>
                   </div>
                 </div>
                 <small className="text-muted1">Last 24 Hour</small>
@@ -214,15 +279,7 @@ const AdminHome: React.FC = () => {
                 <div className="middle">
                   <div className="left">
                     <h3>การเยี่ยมชม</h3>
-                    <h1>256</h1>
-                  </div>
-                  <div className="progres">
-                    <svg className="svg4">
-                      <circle cx="38" cy="38" r="36"></circle>
-                    </svg>
-                    <div className="number">
-                      <p>80%</p>
-                    </div>
+                    <h1>{totalViews}</h1>
                   </div>
                 </div>
                 <small className="text-muted1">Last 24 Hour</small>
@@ -233,7 +290,7 @@ const AdminHome: React.FC = () => {
                 <div className="middle">
                   <div className="left">
                     <h3>บล็อกทั้งหมด</h3>
-                    <h1>325</h1>
+                    <h1>{postCounter}</h1>
                   </div>
                 </div>
                 <small className="text-muted1">Last 24 Hour</small>
@@ -241,7 +298,7 @@ const AdminHome: React.FC = () => {
             </div>
 
             <div className="recent-order">
-              <GrowthChart data={growthData} />
+              <GrowthChart data={postMonthly} />
             </div>
           </div>
         )}
