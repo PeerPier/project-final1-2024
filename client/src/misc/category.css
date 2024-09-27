@@ -1,5 +1,4 @@
 .categories-container {
-<<<<<<< HEAD
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
@@ -38,45 +37,3 @@
   font-size: 14px;
   color: #888;
 }
-=======
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-    margin: 10%;
-  }
-  
-  .category-card {
-    border: 2px solid; /* เพิ่มเส้นกรอบ */
-    border-radius: 5px; /* ให้มุมกรอบมน */
-    padding: 10px 15px; /* เพิ่ม padding */
-    display: inline-block; /* ทำให้กรอบยาวตามความยาวของข้อความ */
-    margin: 5px; /* เว้นระยะระหว่างกรอบ */
-    text-align: center; /* จัดกลางข้อความ */
-  }
-  
-  
-  .category-card:hover {
-    transform: scale(1.05);
-  }
-  
-  .category-icon {
-    font-size: 24px;
-    margin-right: 15px;
-    padding: 10px;
-    border-radius: 50%;
-    color: white;
-  }
-  
-  .category-info h3 {
-    margin: 0;
-    font-size: 18px;
-  }
-  
-  .category-info p {
-    margin: 0;
-    font-size: 14px;
-    color: #888;
-  }
-  
->>>>>>> b4561147f41960d92d343c1c47ed41969d76c71c
