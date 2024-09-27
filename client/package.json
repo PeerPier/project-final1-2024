@@ -19,6 +19,7 @@
     "@types/js-cookie": "3.0.6",
     "@types/react": "18.2.47",
     "@types/socket.io-client": "3.0.0",
+    "@types/styled-components": "^5.1.34",
     "axios": "1.7.2",
     "bcryptjs": "2.4.3",
     "bootstrap": "5.3.3",
@@ -48,6 +49,7 @@
     "react-toastify": "9.1.3",
     "recharts": "2.12.2",
     "socket.io-client": "4.7.5",
+    "styled-components": "^6.1.13",
     "web-vitals": "2.1.4"
   },
   "scripts": {

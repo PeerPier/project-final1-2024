@@ -22,11 +22,13 @@ import Setting3 from "./Screens/setting3";
 import Sidebar from "./Screens/sidebar";
 import Settingtest from "./Screens/settingtest";
 import Category from "./Screens/category";
+import Popular from "./Screens/Popular";
 import Footer from "./Navbar/footer";
 import ForgotPassword from "./Screens/ForgotPassword";
 import ResetPassword from "./Screens/ResetPassword";
 import Post from "./Screens/post";
 import Chat from "./Screens/chat";
+import HelpCentre from "./Screens/helpcentre";
 import { ChatContextProvider } from "./Screens/ChatContext";
 import Navbar2 from "./Navbar/Navbar1";
 import EditPost from "./Screens/edit-post";
@@ -61,8 +63,10 @@ function App() {
             <Route path="/sidebar" element={<Sidebar />} />
             <Route path="/st" element={<Settingtest />} />
             <Route path="/footer" element={<Footer />} />
+            <Route path="/helpcentre" element={<HelpCentre />} />
             <Route path="/content/:id" element={<Content />} />
             <Route path="/category" element={<Category />} />
+            <Route path="/popular" element={<Popular />} />
             <Route path="/search" element={<SearchResults />} />
           </Route>
 
