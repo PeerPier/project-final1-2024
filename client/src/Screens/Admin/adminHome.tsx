@@ -719,48 +719,38 @@ const AdminHome: React.FC = () => {
                     </thead>
                     {adminProfile && (
                       <tbody>
-                        <tr>
-                          <td>{adminProfile.username}</td>
-                          <td></td>
-                          <td>คาเฟ่น่านั่งขอนแก่น</td>
-                          <td className="warning">Pending</td>
-                          <td className="primary">Details</td>
-                        </tr>
-                        <tr>
-                          <td>{adminProfile.username}</td>
-                          <td></td>
-                          <td>คาเฟ่น่านั่งขอนแก่น</td>
-                          <td className="warning">Pending</td>
-                          <td className="primary">Details</td>
-                        </tr>
-                        <tr>
-                          <td>{adminProfile.username}</td>
-                          <td></td>
-                          <td>คาเฟ่น่านั่งขอนแก่น</td>
-                          <td className="warning">Pending</td>
-                          <td className="primary">Details</td>
-                        </tr>
-                        <tr>
-                          <td>{adminProfile.username}</td>
-                          <td></td>
-                          <td>คาเฟ่น่านั่งขอนแก่น</td>
-                          <td className="warning">Pending</td>
-                          <td className="primary">Details</td>
-                        </tr>
-                        <tr>
-                          <td>{adminProfile.username}</td>
-                          <td></td>
-                          <td>คาเฟ่น่านั่งขอนแก่น</td>
-                          <td className="warning">Pending</td>
-                          <td className="primary">Details</td>
-                        </tr>
-                        <tr>
-                          <td>{adminProfile.username}</td>
-                          <td></td>
-                          <td>คาเฟ่น่านั่งขอนแก่น</td>
-                          <td className="warning">Pending</td>
-                          <td className="primary">Details</td>
-                        </tr>
+                        {reports.length > 0 ? (
+                          reports.map((report) =>
+                            !report.verified ? (
+                              <tr key={report._id}>
+                                <td>{report.reportedBy.firstname}</td>
+                                <td>
+                                  {new Date(
+                                    report.createdAt
+                                  ).toLocaleDateString()}
+                                </td>
+                                <td>{report.reason || "No Title"}</td>
+                                <td className="warning">
+                                  {report.verified ? "Verified" : "Pending"}
+                                </td>
+                                <td className="primary">
+                                  <Button
+                                    variant="info"
+                                    onClick={() => handleShowModal(report)}
+                                  >
+                                    Details
+                                  </Button>
+                                </td>
+                              </tr>
+                            ) : (
+                              <></>
+                            )
+                          )
+                        ) : (
+                          <tr>
+                            <td colSpan={5}>No reports available</td>
+                          </tr>
+                        )}
                       </tbody>
                     )}
                   </table>
@@ -824,48 +814,38 @@ const AdminHome: React.FC = () => {
                       </thead>
                       {adminProfile && (
                         <tbody>
-                          <tr>
-                            <td>{adminProfile.username}</td>
-                            <td></td>
-                            <td>คาเฟ่น่านั่งขอนแก่น</td>
-                            <td className="success">Approve</td>
-                            <td className="primary">Details</td>
-                          </tr>
-                          <tr>
-                            <td>{adminProfile.username}</td>
-                            <td></td>
-                            <td>คาเฟ่น่านั่งขอนแก่น</td>
-                            <td className="success">Approve</td>
-                            <td className="primary">Details</td>
-                          </tr>
-                          <tr>
-                            <td>{adminProfile.username}</td>
-                            <td></td>
-                            <td>คาเฟ่น่านั่งขอนแก่น</td>
-                            <td className="success">Approve</td>
-                            <td className="primary">Details</td>
-                          </tr>
-                          <tr>
-                            <td>{adminProfile.username}</td>
-                            <td></td>
-                            <td>คาเฟ่น่านั่งขอนแก่น</td>
-                            <td className="success">Approve</td>
-                            <td className="primary">Details</td>
-                          </tr>
-                          <tr>
-                            <td>{adminProfile.username}</td>
-                            <td></td>
-                            <td>คาเฟ่น่านั่งขอนแก่น</td>
-                            <td className="success">Approve</td>
-                            <td className="primary">Details</td>
-                          </tr>
-                          <tr>
-                            <td>{adminProfile.username}</td>
-                            <td></td>
-                            <td>คาเฟ่น่านั่งขอนแก่น</td>
-                            <td className="success">Approve</td>
-                            <td className="primary">Details</td>
-                          </tr>
+                          {reports.length > 0 ? (
+                            reports.map((report) =>
+                              report.verified ? (
+                                <tr key={report._id}>
+                                  <td>{report.reportedBy.firstname}</td>
+                                  <td>
+                                    {new Date(
+                                      report.createdAt
+                                    ).toLocaleDateString()}
+                                  </td>
+                                  <td>{report.reason || "No Title"}</td>
+                                  <td className="warning">
+                                    {report.verified ? "Verified" : "Pending"}
+                                  </td>
+                                  <td className="primary">
+                                    <Button
+                                      variant="info"
+                                      onClick={() => handleShowModal(report)}
+                                    >
+                                      Details
+                                    </Button>
+                                  </td>
+                                </tr>
+                              ) : (
+                                <></>
+                              )
+                            )
+                          ) : (
+                            <tr>
+                              <td colSpan={5}>No reports available</td>
+                            </tr>
+                          )}
                         </tbody>
                       )}
                     </table>
