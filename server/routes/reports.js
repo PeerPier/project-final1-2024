@@ -64,6 +64,7 @@ router.patch("/:id/verify", async (req, res) => {
       return res.status(404).json({ message: "Report not found" });
     }
     report.verified = verified;
+    report.status = "Verified";
     await report.save();
     res.status(200).json({ message: "Report updated", report });
   } catch (error) {
@@ -94,6 +95,7 @@ router.delete("/:reportId/deletePost", async (req, res) => {
     await Post.deleteOne({ _id: post._id });
 
     report.verified = true;
+    report.status = "Decline";
     await report.save();
 
     res

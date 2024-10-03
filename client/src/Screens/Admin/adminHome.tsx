@@ -35,6 +35,7 @@ interface Report {
   _id: string;
   reason: string;
   verified: boolean;
+  status: string;
   createdAt: string;
   reportedBy: {
     firstname: string;
@@ -670,6 +671,7 @@ const AdminHome: React.FC = () => {
                                 <Button
                                   variant="info"
                                   onClick={() => handleShowModal(report)}
+                                  disabled={report.verified ? true : false}
                                 >
                                   Details
                                 </Button>
@@ -737,6 +739,7 @@ const AdminHome: React.FC = () => {
                                   <Button
                                     variant="info"
                                     onClick={() => handleShowModal(report)}
+                                    disabled={report.verified ? true : false}
                                   >
                                     Details
                                   </Button>
@@ -754,6 +757,15 @@ const AdminHome: React.FC = () => {
                       </tbody>
                     )}
                   </table>
+                  {/* Report Details Modal */}
+                  {selectedReport && (
+                    <ReportDetailsModal
+                      showModal={showModal}
+                      handleClose={handleCloseModal}
+                      report={selectedReport}
+                      refreshReports={refreshReports}
+                    />
+                  )}
                 </div>
               )}
 
@@ -801,55 +813,61 @@ const AdminHome: React.FC = () => {
                       ))}
                     </Form>
                   </div>
-                  {selectedApprove === "blog-success" && (
-                    <table>
-                      <thead className="pt-5">
-                        <tr>
-                          <th>User Name</th>
-                          <th>Date</th>
-                          <th>Title</th>
-                          <th>Status</th>
-                          <th>Details</th>
-                        </tr>
-                      </thead>
-                      {adminProfile && (
-                        <tbody>
-                          {reports.length > 0 ? (
-                            reports.map((report) =>
-                              report.verified ? (
-                                <tr key={report._id}>
-                                  <td>{report.reportedBy.firstname}</td>
-                                  <td>
-                                    {new Date(
-                                      report.createdAt
-                                    ).toLocaleDateString()}
-                                  </td>
-                                  <td>{report.reason || "No Title"}</td>
-                                  <td className="warning">
-                                    {report.verified ? "Verified" : "Pending"}
-                                  </td>
-                                  <td className="primary">
-                                    <Button
-                                      variant="info"
-                                      onClick={() => handleShowModal(report)}
-                                    >
-                                      Details
-                                    </Button>
-                                  </td>
-                                </tr>
-                              ) : (
-                                <></>
+                  <div>
+                    {selectedApprove === "blog-success" && (
+                      <table>
+                        <thead className="pt-5">
+                          <tr>
+                            <th>User Name</th>
+                            <th>Date</th>
+                            <th>Title</th>
+                            <th>Status</th>
+                            <th>Details</th>
+                          </tr>
+                        </thead>
+                        {adminProfile && (
+                          <tbody>
+                            {reports.length > 0 ? (
+                              reports.map((report) =>
+                                report.verified &&
+                                report.status === "Verified" ? (
+                                  <tr key={report._id}>
+                                    <td>{report.reportedBy.firstname}</td>
+                                    <td>
+                                      {new Date(
+                                        report.createdAt
+                                      ).toLocaleDateString()}
+                                    </td>
+                                    <td>{report.reason || "No Title"}</td>
+                                    <td className="warning">
+                                      {report.verified ? "Verified" : "Pending"}
+                                    </td>
+                                    <td className="primary">
+                                      <Button
+                                        variant="info"
+                                        onClick={() => handleShowModal(report)}
+                                        disabled={
+                                          report.verified ? true : false
+                                        }
+                                      >
+                                        Details
+                                      </Button>
+                                    </td>
+                                  </tr>
+                                ) : (
+                                  <></>
+                                )
                               )
-                            )
-                          ) : (
-                            <tr>
-                              <td colSpan={5}>No reports available</td>
-                            </tr>
-                          )}
-                        </tbody>
-                      )}
-                    </table>
-                  )}
+                            ) : (
+                              <tr>
+                                <td colSpan={5}>No reports available</td>
+                              </tr>
+                            )}
+                          </tbody>
+                        )}
+                      </table>
+                    )}
+                  </div>
 
                   {selectedApprove === "blog-decline" && (
                     <table>
@@ -864,48 +882,37 @@ const AdminHome: React.FC = () => {
                       </thead>
                       {adminProfile && (
                         <tbody>
-                          <tr>
-                            <td>{adminProfile.username}</td>
-                            <td></td>
-                            <td>คาเฟ่น่านั่งขอนแก่น</td>
-                            <td className="danger">Decline</td>
-                            <td className="primary">Details</td>
-                          </tr>
-                          <tr>
-                            <td>{adminProfile.username}</td>
-                            <td></td>
-                            <td>คาเฟ่น่านั่งขอนแก่น</td>
-                            <td className="danger">Decline</td>
-                            <td className="primary">Details</td>
-                          </tr>
-                          <tr>
-                            <td>{adminProfile.username}</td>
-                            <td></td>
-                            <td>คาเฟ่น่านั่งขอนแก่น</td>
-                            <td className="danger">Decline</td>
-                            <td className="primary">Details</td>
-                          </tr>
-                          <tr>
-                            <td>{adminProfile.username}</td>
-                            <td></td>
-                            <td>คาเฟ่น่านั่งขอนแก่น</td>
-                            <td className="danger">Decline</td>
-                            <td className="primary">Details</td>
-                          </tr>
-                          <tr>
-                            <td>{adminProfile.username}</td>
-                            <td></td>
-                            <td>คาเฟ่น่านั่งขอนแก่น</td>
-                            <td className="danger">Decline</td>
-                            <td className="primary">Details</td>
-                          </tr>
-                          <tr>
-                            <td>{adminProfile.username}</td>
-                            <td></td>
-                            <td>คาเฟ่น่านั่งขอนแก่น</td>
-                            <td className="danger">Decline</td>
-                            <td className="primary">Details</td>
-                          </tr>
+                          {reports.length > 0 ? (
+                            reports.map((report) =>
+                              report.status === "Decline" ? (
+                                <tr key={report._id}>
+                                  <td>{report.reportedBy.firstname}</td>
+                                  <td>
+                                    {new Date(
+                                      report.createdAt
+                                    ).toLocaleDateString()}
+                                  </td>
+                                  <td>{report.reason || "No Title"}</td>
+                                  <td className="warning">{report.status}</td>
+                                  <td className="primary">
+                                    <Button
+                                      variant="info"
+                                      onClick={() => handleShowModal(report)}
+                                      disabled={report.verified ? true : false}
+                                    >
+                                      Details
+                                    </Button>
+                                  </td>
+                                </tr>
+                              ) : (
+                                <></>
+                              )
+                            )
+                          ) : (
+                            <tr>
+                              <td colSpan={5}>No reports available</td>
+                            </tr>
+                          )}
                         </tbody>
                       )}
                     </table>
@@ -1031,9 +1038,7 @@ const AdminHome: React.FC = () => {
             </div>
           </div>
         )}
-
         {selectedCate === "manage-user" && <ManageUser />}
-
         {selectedCate === "manage-user" && (
           <div className="right">
             <div className="top">

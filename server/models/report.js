@@ -10,6 +10,10 @@ const reportSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    status: {
+      type: String,
+      default: "Pending",
+    },
     reportedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

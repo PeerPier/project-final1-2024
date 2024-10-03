@@ -7,6 +7,7 @@ interface Report {
   _id: string;
   reason: string;
   verified: boolean;
+  status: string;
   createdAt: string;
   reportedBy: {
     firstname: string;
