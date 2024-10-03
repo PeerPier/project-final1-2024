@@ -249,6 +249,20 @@ const AdminHome: React.FC = () => {
     fetchReports();
   };
 
+  const countVerifiedReports = (reports: Report[]): number => {
+    return reports.reduce(
+      (count, report) => (!report.verified ? count + 1 : count),
+      0
+    );
+  };
+
+  const countNoVerifiedReports = (reports: Report[]): number => {
+    return reports.reduce(
+      (count, report) => (report.verified ? count + 1 : count),
+      0
+    );
+  };
+
   return (
     <div className="adminHome">
       <div className="contain">
@@ -506,7 +520,7 @@ const AdminHome: React.FC = () => {
                   <div className="middle">
                     <div className="left">
                       <h3>บล็อกทั้งหมด</h3>
-                      <h1>325</h1>
+                      <h1>{reports.length}</h1>
                     </div>
                   </div>
                 </div>
@@ -521,7 +535,7 @@ const AdminHome: React.FC = () => {
                   <div className="middle">
                     <div className="left">
                       <h3>รอตรวจสอบ</h3>
-                      <h1>6</h1>
+                      <h1>{countVerifiedReports(reports)}</h1>
                     </div>
                   </div>
                 </div>
@@ -537,7 +551,7 @@ const AdminHome: React.FC = () => {
                   <div className="middle">
                     <div className="left">
                       <h3>ตรวจสอบแล้ว</h3>
-                      <h1>256</h1>
+                      <h1>{countNoVerifiedReports(reports)}</h1>
                     </div>
                   </div>
                 </div>
@@ -558,7 +572,7 @@ const AdminHome: React.FC = () => {
                   className="recent-order"
                   style={{
                     overflowY: "scroll",
-                    maxHeight: "400px",
+                    maxHeight: "60%",
                     margin: "0",
                     borderRadius: "2rem",
                   }}
