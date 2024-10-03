@@ -5,6 +5,7 @@ import {
   savePost,
   likePost,
   deleteSave,
+  addReport,
 } from "../api/post";
 import { Post } from "../types/post";
 import { useNavigate } from "react-router-dom";
@@ -216,13 +217,28 @@ const Feeds = () => {
 
   const handleReportPost = async () => {
     if (reportPostId && reportReason) {
+      console.log("reportPostId", reportPostId);
+      console.log("reportReason", reportReason);
       try {
-        console.log(
-          `Reported post ${reportPostId} with reason: ${reportReason}`
-        );
+        const userId = localStorage.getItem("userId");
+        console.log("userId", userId);
+
+        if (!userId) {
+          throw new Error("User is not logged in.");
+        }
+
+        const response = await addReport(reportPostId, reportReason, userId);
+
+        if (response && response.status === 201) {
+          alert("Report submitted successfully!");
+        } else {
+          alert("Failed to submit the report.");
+        }
+
         handleCloseReportModal();
       } catch (error) {
         console.error("Failed to report post:", error);
+        alert("An error occurred while submitting the report.");
       }
     } else {
       console.log("Please enter a reason for the report.");

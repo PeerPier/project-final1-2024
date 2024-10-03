@@ -80,6 +80,7 @@ const resetPasswordRouter = require("./routes/resetPassword");
 const FollowUser = require("./routes/follow");
 const notificationRouter = require("./routes/notifications");
 const questionRouter = require("./routes/QuestionRoutes");
+const reportRouter = require("./routes/reports");
 
 app.use("/notifications", notificationRouter);
 app.use("/register", registerRouter);
@@ -95,6 +96,7 @@ app.use("/follow", FollowUser);
 app.use("/admin", AdminProfile);
 app.use("/admin/register", AdminRegister);
 app.use("/api/questions", questionRouter);
+app.use("/api/report", reportRouter);
 
 // Connect to MongoDB
 mongoose

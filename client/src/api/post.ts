@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { Post } from "../types/post";
 import Cookies from "js-cookie";
 
@@ -101,6 +101,32 @@ const editPost = async (id: string, post: any): Promise<any> => {
 //     throw error;
 //   }
 // };
+
+const addReport = async (
+  postId: string,
+  reason: string,
+  userId: string
+): Promise<AxiosResponse<any>> => {
+  const url = `${API_BASE_URL}/api/report/add`; // Notice the `/api/report` here
+
+  try {
+    const response = await axios.post(url, {
+      postId,
+      reason,
+      reportedBy: userId,
+    });
+
+    return response;
+    // if (response.status !== 201) {
+    //   throw new Error(
+    //     `Server returned ${response.status} ${response.statusText}`
+    //   );
+    // }
+  } catch (error: any) {
+    console.error("Error reporting post:", error.message);
+    throw error;
+  }
+};
 
 const addComment = async (id: string, content: string): Promise<void> => {
   const url = `${API_BASE_URL}/posts/${id}/comment`;
@@ -435,4 +461,5 @@ export {
   deleteComment,
   Replycomment,
   deleteReply,
+  addReport,
 };

@@ -141,25 +141,20 @@ router.patch("/:id", getPost, async (req, res) => {
 // ลบข้อมูลโพสต์บล็อก
 router.delete("/:id", auth, getPost, async (req, res) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ message: "User not authenticated" });
-    }
+    const post = res.post;
 
-    if (!res.post) {
-      return res.status(404).json({ message: "Post not found" });
-    }
-
-    if (res.post.user._id.toString() !== req.user._id.toString()) {
+    if (post.user._id.toString() !== req.user._id.toString()) {
       return res
         .status(403)
         .json({ message: "You are not authorized to delete this post" });
     }
 
-    await Comment.deleteMany({ post: res.post._id });
-    await Like.deleteMany({ post: res.post._id });
+    await Comment.deleteMany({ post: post._id });
+    await Like.deleteMany({ post: post._id });
 
-    await Post.deleteOne({ _id: res.post._id });
-    res.json({ message: "Deleted Post" });
+    await Post.deleteOne({ _id: post._id });
+
+    res.json({ message: "Post deleted successfully" });
   } catch (error) {
     console.error("Error deleting post:", error);
     res.status(500).json({ message: "Error deleting post: " + error.message });

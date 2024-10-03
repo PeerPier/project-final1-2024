@@ -27,10 +27,33 @@ import { IoNotifications } from "react-icons/io5";
 import { FaUserMinus } from "react-icons/fa6";
 import ManageCate from "./manageCate";
 import ManageQ from "./manageQ";
+import axios from "axios";
+import ReportDetailsModal from "./approve-modal";
+import { Button } from "react-bootstrap";
+
+interface Report {
+  _id: string;
+  reason: string;
+  verified: boolean;
+  createdAt: string;
+  reportedBy: {
+    firstname: string;
+  };
+  post: {
+    _id: string;
+    user: {
+      firstname: string;
+    };
+    image: string;
+    topic: string;
+  };
+}
 
 const AdminHome: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [adminProfile, setAdminProfile] = useState<any>(null);
+  const API_BASE_URL = "http://localhost:3001";
+
+  const [adminProfile, setAdminProfile] = useState<any>(true);
 
   const [userCounter, setUserCounter] = useState<number>(0);
   const [postCounter, setPostCounter] = useState<number>(0);
@@ -47,6 +70,37 @@ const AdminHome: React.FC = () => {
   const [selectedBlog, setSelectedBlog] = useState<string>("blog-all");
   const [selectedApprove, setSelectedApprove] =
     useState<string>("blog-success");
+
+  const [reports, setReports] = useState<Report[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+
+  const handleShowModal = (report: any) => {
+    setSelectedReport(report);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedReport(null);
+  };
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        const response = await axios.get("http://localhost:3001/api/report");
+        setReports(response.data);
+      } catch (error) {
+        console.error("Error fetching reports:", error);
+      }
+    };
+
+    fetchReports();
+  }, []);
+
+  useEffect(() => {
+    console.log("Fetched Reports:", reports);
+  }, [reports]);
 
   const convertPostsToGrowthData = (posts: any[]) => {
     const monthNames = [
@@ -170,12 +224,29 @@ const AdminHome: React.FC = () => {
     fetchData();
   }, []);
 
+  const fetchReports = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/report`);
+      setReports(response.data);
+    } catch (error) {
+      console.error("Error fetching reports:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchReports();
+  }, []);
+
   const handleCategorySelection = (category: string) => {
     setSelectedCate(category);
   };
 
   const handleTableSelection = (Table: string) => {
     setSelectedBlog(Table);
+  };
+
+  const refreshReports = () => {
+    fetchReports();
   };
 
   return (
@@ -492,7 +563,7 @@ const AdminHome: React.FC = () => {
                     borderRadius: "2rem",
                   }}
                 >
-                  <table>
+                  {/* <table>
                     <thead className="pt-5">
                       <tr>
                         <th>User Name</th>
@@ -555,7 +626,60 @@ const AdminHome: React.FC = () => {
                         </tr>
                       </tbody>
                     )}
+                  </table> */}
+                  <table>
+                    <thead className="pt-5">
+                      <tr>
+                        <th>User Name</th>
+                        <th>Date</th>
+                        <th>Title</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                      </tr>
+                    </thead>
+                    {adminProfile && (
+                      <tbody>
+                        {reports.length > 0 ? (
+                          reports.map((report) => (
+                            <tr key={report._id}>
+                              <td>{report.reportedBy.firstname}</td>
+                              <td>
+                                {new Date(
+                                  report.createdAt
+                                ).toLocaleDateString()}
+                              </td>
+                              <td>{report.reason || "No Title"}</td>
+                              <td className="warning">
+                                {report.verified ? "Verified" : "Pending"}
+                              </td>
+                              <td className="primary">
+                                <Button
+                                  variant="info"
+                                  onClick={() => handleShowModal(report)}
+                                >
+                                  Details
+                                </Button>
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={5}>No reports available</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    )}
                   </table>
+
+                  {/* Report Details Modal */}
+                  {selectedReport && (
+                    <ReportDetailsModal
+                      showModal={showModal}
+                      handleClose={handleCloseModal}
+                      report={selectedReport}
+                      refreshReports={refreshReports}
+                    />
+                  )}
                 </div>
               )}
 

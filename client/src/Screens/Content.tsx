@@ -144,6 +144,9 @@ const Content = () => {
       const result = await Replycomment(postId, commentId, replyData);
       console.log("Reply posted successfully:", result);
 
+      const res = await getPostById(postId);
+      setPost(res);
+
       // ล้างช่องกรอกข้อความหลังจากส่งสำเร็จ
       setReplyText("");
     } catch (error) {
@@ -163,6 +166,7 @@ const Content = () => {
     commentId: string,
     replyTo: string
   ) => {
+    console.log("handleReplyToReplySubmit", postId, commentId, replyTo);
     if (!replyText.trim()) {
       alert("Please enter a reply.");
       return;
@@ -557,12 +561,12 @@ const Content = () => {
                                       </div>
                                       <div className="reply-content">
                                         <a
-                                          href={`/profile/${reply.author._id}`}
+                                          href={`/profile/${reply.replyTo._id}`}
                                           style={{
                                             marginRight: "5px",
                                           }}
                                         >
-                                          {reply.author.username}
+                                          {reply.replyTo.firstname}
                                         </a>
                                         <span
                                           dangerouslySetInnerHTML={{
@@ -622,17 +626,11 @@ const Content = () => {
                                         />
                                         <button
                                           onClick={() => {
-                                            reply.author?._id === id
-                                              ? handleReplyToReplySubmit(
-                                                  post._id,
-                                                  comment._id,
-                                                  reply.author._id
-                                                )
-                                              : handleReplyToReplySubmit(
-                                                  post._id,
-                                                  comment._id,
-                                                  reply.author._id
-                                                );
+                                            handleReplyToReplySubmit(
+                                              post._id,
+                                              comment._id,
+                                              reply.author._id
+                                            );
                                           }}
                                           className="send-icon1"
                                         >
@@ -645,7 +643,6 @@ const Content = () => {
                               </div>
                             );
                           })}
-
                         {replyingCommentId === comment._id && (
                           <div
                             className="reply d-flex"
