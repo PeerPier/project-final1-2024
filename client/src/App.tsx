@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -33,6 +33,22 @@ import EditPost from "./Screens/edit-post";
 import SearchResults from "./Navbar/SearchResults ";
 import HelpCentre from "./Screens/helpcentre";
 import Popular from "./Screens/Popular";
+import { createContext } from "react";
+import { lookInSession } from "./common/session";
+
+interface UserContextType {
+  userAuth: {
+    access_token: string | null;
+    username?: string;
+    profile_picture?: string;
+  };
+  setUserAuth: React.Dispatch<React.SetStateAction<any>>;
+}
+
+export const UserContext = createContext<UserContextType>({
+  userAuth: { access_token: null },
+  setUserAuth: () => {},
+});
 
 function NavbarLayout() {
   return (
@@ -44,9 +60,20 @@ function NavbarLayout() {
 }
 
 function App() {
+  const [userAuth, setUserAuth] = useState<{ access_token: string | null }>({
+    access_token: null,
+  });
+
+  useEffect(() => {
+    const userInSession = lookInSession("user");
+
+    userInSession
+      ? setUserAuth(JSON.parse(userInSession))
+      : setUserAuth({ access_token: null });
+  }, []);
   return (
-    <ChatContextProvider>
-      <Router>
+    <UserContext.Provider value={{ userAuth, setUserAuth }}>
+      <ChatContextProvider>
         <Routes>
           <Route element={<NavbarLayout />}>
             <Route path="/" element={<HomePage />} />
@@ -82,8 +109,8 @@ function App() {
           <Route path="/chats" element={<Chat />} />
           <Route path="/nav" element={<Navbar2 />} />
         </Routes>
-      </Router>
-    </ChatContextProvider>
+      </ChatContextProvider>
+    </UserContext.Provider>
   );
 }
 

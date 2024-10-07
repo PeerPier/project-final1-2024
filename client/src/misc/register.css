@@ -118,11 +118,11 @@
 }
 
 @media screen and (max-width: 768px) {
-  button {
+  /* button {
     bottom: 50px;
     left: 50%;
     transform: translateX(-50%);
-  }
+  } */
 
   #navbar .linka {
     display: none;
