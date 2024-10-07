@@ -29,12 +29,14 @@ import Post from "./Screens/post";
 import Chat from "./Screens/chat";
 import { ChatContextProvider } from "./Screens/ChatContext";
 import Navbar2 from "./Navbar/Navbar1";
+import Navbar from "./Navbar/Navbar";
 import EditPost from "./Screens/edit-post";
 import SearchResults from "./Navbar/SearchResults ";
 import HelpCentre from "./Screens/helpcentre";
 import Popular from "./Screens/Popular";
 import { createContext } from "react";
 import { lookInSession } from "./common/session";
+import UserAuthForm from "./Screens/UserAuthForm";
 
 interface UserContextType {
   userAuth: {
@@ -53,7 +55,7 @@ export const UserContext = createContext<UserContextType>({
 function NavbarLayout() {
   return (
     <>
-      <Navbar2 />
+      <Navbar />
       <Outlet />
     </>
   );
@@ -76,6 +78,14 @@ function App() {
       <ChatContextProvider>
         <Routes>
           <Route element={<NavbarLayout />}>
+            <Route
+              path="/signin"
+              element={<UserAuthForm type="เข้าสู่ระบบ" />}
+            />
+            <Route
+              path="/signup"
+              element={<UserAuthForm type="สมัครสมาชิก" />}
+            />
             <Route path="/" element={<HomePage />} />
             <Route path="/register" element={<RegistPage />} />
             <Route path="/test" element={<TestPage />} />
