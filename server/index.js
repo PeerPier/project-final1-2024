@@ -5,9 +5,11 @@ const path = require("path");
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const fs = require("fs");
+const serviceAccountKey = require("./kku-blogging-firebase-adminsdk-blvad-4d6e110e4e.json");
 const cookieParser = require("cookie-parser");
 const admin = require("firebase-admin");
 const { getAuth } = require("firebase-admin/auth");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 require("dotenv").config();
@@ -65,6 +67,8 @@ const FollowUser = require("./routes/follow");
 const notificationRouter = require("./routes/notifications");
 const questionRouter = require("./routes/QuestionRoutes");
 const reportRouter = require("./routes/reports");
+const User = require("./models/user");
+const BlogCreated = require("./routes/blog");
 
 app.use("/signup", registerRouter);
 app.use("/signin", loginRouter);
@@ -83,6 +87,7 @@ app.use("/admin", AdminProfile);
 app.use("/admin/register", AdminRegister);
 app.use("/api/questions", questionRouter);
 app.use("/api/report", reportRouter);
+app.use("/uploads", express.static("uploads"));
 
 const generateUsername = async (email) => {
   const { nanoid } = await import("nanoid");

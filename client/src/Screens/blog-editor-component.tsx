@@ -7,7 +7,7 @@ import { uploadImage } from "../common/b2";
 import { useContext, useEffect, useRef } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import { EditorContext } from "./editor-page";
-import EditorJS from "@editorjs/editorjs";
+import EditorJS, { OutputData } from "@editorjs/editorjs";
 import { tools } from "./tools.component";
 
 const BlogEditor = () => {
@@ -42,20 +42,24 @@ const BlogEditor = () => {
     if (img) {
       uploadImage(img) // ถ้ามีไฟล์เรียกใช้ uploadImage
         .then((url) => {
+          console.log("Uploaded URL:", url);
           if (url) {
             toast.dismiss(loadingToast);
             toast.success("Uploaded!");
-            setBlog({ ...blog, banner: url }); // อัพเดต state ของ blog
+            setBlog({ ...blog, banner: url });
+            console.log("Uploaded URL:", url);
+            console.log("Updated Blog Banner:", { ...blog, banner: url });
           }
         })
         .catch((err) => {
           toast.dismiss(loadingToast);
-          return toast.error(err.message || "Error uploading image."); // แสดงข้อความผิดพลาด
+          return toast.error(err.message || "Error uploading image.");
         });
     } else {
       toast.dismiss(loadingToast);
       toast.error("Please select an image."); // แจ้งเตือนถ้าไม่มีการเลือกไฟล์
     }
+    console.log("Banner URL:", banner);
   };
 
   const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

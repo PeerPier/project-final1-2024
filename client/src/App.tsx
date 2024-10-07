@@ -37,6 +37,7 @@ import Popular from "./Screens/Popular";
 import { createContext } from "react";
 import { lookInSession } from "./common/session";
 import UserAuthForm from "./Screens/UserAuthForm";
+import Editor from "./Screens/editor-page";
 
 interface UserContextType {
   userAuth: {
@@ -106,6 +107,7 @@ function App() {
             <Route path="/popular" element={<Popular />} />
             <Route path="/search" element={<SearchResults />} />
           </Route>
+          <Route path="/editor" element={<Editor />} />
 
           <Route path="/login" element={<LoginPage />} />
           <Route path="/admin/register" element={<RegisterAdmin />} />
