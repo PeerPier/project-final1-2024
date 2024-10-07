@@ -6,6 +6,8 @@ const bodyParser = require("body-parser");
 const multer = require("multer");
 const fs = require("fs");
 const cookieParser = require("cookie-parser");
+const admin = require("firebase-admin");
+const { getAuth } = require("firebase-admin/auth");
 
 const app = express();
 require("dotenv").config();
@@ -26,45 +28,27 @@ app.use(
   })
 );
 
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccountKey),
+});
+
 app.use(cookieParser());
 app.use(express.json());
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, "uploads");
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir);
-    }
-    cb(null, uploadDir);
+    cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname);
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(
+      null,
+      file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname)
+    ); // เก็บไฟล์ด้วยชื่อที่ไม่ซ้ำ
   },
 });
 
-const upload = multer({ storage });
-
-app.post("/upload", upload.single("file"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ message: "No file uploaded." });
-  }
-  res.json({ imageUrl: `http://localhost:3001/uploads/${req.file.filename}` });
-});
-
-app.post("/uploads", upload.array("files"), (req, res) => {
-  console.log("Uploaded files:", req.files);
-
-  if (!req.files || req.files.length === 0) {
-    return res.status(400).json({ message: "No files uploaded." });
-  }
-
-  const fileUrls = req.files.map(
-    (file) => `http://localhost:3001/uploads/${file.filename}`
-  );
-  res.json({ fileUrls });
-});
-
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+const upload = multer({ storage: storage });
 
 const registerRouter = require("./routes/register");
 const loginRouter = require("./routes/login");
@@ -82,6 +66,8 @@ const notificationRouter = require("./routes/notifications");
 const questionRouter = require("./routes/QuestionRoutes");
 const reportRouter = require("./routes/reports");
 
+app.use("/signup", registerRouter);
+app.use("/signin", loginRouter);
 app.use("/notifications", notificationRouter);
 app.use("/register", registerRouter);
 app.use("/login", loginRouter);
@@ -97,6 +83,102 @@ app.use("/admin", AdminProfile);
 app.use("/admin/register", AdminRegister);
 app.use("/api/questions", questionRouter);
 app.use("/api/report", reportRouter);
+
+const generateUsername = async (email) => {
+  const { nanoid } = await import("nanoid");
+  let username = email.split("@")[0];
+
+  const isUsernameNotUnique = await User.exists({ username }).then(
+    (result) => result
+  );
+
+  if (isUsernameNotUnique) {
+    username += nanoid().substring(0, 5);
+  }
+
+  return username;
+};
+const formDatatoSend = (user) => {
+  const access_token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+  return {
+    access_token,
+    profile_picture: user.profile_picture,
+    username: user.username,
+    fullname: user.fullname,
+  };
+};
+module.exports = formDatatoSend;
+
+app.post("/google-auth", async (req, res) => {
+  const { access_token } = req.body;
+
+  if (!access_token) {
+    return res.status(400).json({ error: "Token is required" });
+  }
+
+  try {
+    // ตรวจสอบ ID Token
+    const decodedUser = await getAuth().verifyIdToken(access_token);
+    const { email, name, picture } = decodedUser;
+
+    // ปรับขนาดรูปภาพ
+    const profilePicture = picture.replace("s96-c", "s384-c");
+
+    // ค้นหาผู้ใช้ในฐานข้อมูล
+    let user = await User.findOne({ email }).select(
+      "fullname username profile_picture google_auth"
+    );
+
+    if (user) {
+      if (!user.google_auth) {
+        return res.status(403).json({
+          error:
+            "อีเมลนี้ได้ลงทะเบียนโดยไม่ใช้ Google แล้ว กรุณาเข้าสู่ระบบด้วยรหัสผ่านเพื่อเข้าถึงบัญชี",
+        });
+      }
+    } else {
+      // สร้างผู้ใช้ใหม่
+      const username = await generateUsername(email);
+
+      user = new User({
+        fullname: name,
+        email,
+        username,
+        google_auth: true,
+      });
+
+      user = await user.save();
+    }
+
+    return res.status(200).json(formDatatoSend(user));
+  } catch (err) {
+    console.error("Authentication error:", err);
+    // ตรวจสอบว่าเคยส่งการตอบกลับไปยังไคลเอนต์หรือยัง
+    if (!res.headersSent) {
+      return res.status(500).json({
+        error:
+          "ล้มเหลวในการรับรองความถูกต้องของคุณกับ Google ลองใช้บัญชี Google อื่น",
+      });
+    }
+  }
+});
+
+// เส้นทางสำหรับการอัพโหลดภาพ
+app.post("/get-upload-picture", upload.single("file"), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    return res.status(200).json({
+      message: "File uploaded successfully",
+      filename: req.file.filename,
+    });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).json({ error: err.message });
+  }
+});
 
 // Connect to MongoDB
 mongoose
