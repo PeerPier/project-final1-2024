@@ -88,6 +88,7 @@ app.use("/admin/register", AdminRegister);
 app.use("/api/questions", questionRouter);
 app.use("/api/report", reportRouter);
 app.use("/uploads", express.static("uploads"));
+app.use("/create-blog", BlogCreated);
 
 const generateUsername = async (email) => {
   const { nanoid } = await import("nanoid");

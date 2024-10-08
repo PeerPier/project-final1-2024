@@ -25,33 +25,44 @@ const verifyJWT = (req, res, next) => {
 };
 
 router.post("/", verifyJWT, (req, res) => {
-  const { nanoid } = import("nanoid");
+  const { nanoid } = require("nanoid");
   let authorId = req.user;
+  let { topic, des, banner, tags, content, draft } = req.body;
 
-  let { topic, des, banner, tags, content } = req.body;
-
-  if (!topic.length) {
-    return res.status(403).json({ error: "คุณต้องระบุชื่อเพื่อเผยแพร่บล็อก" });
+  if (!topic || topic.length === 0) {
+    return res.status(403).json({ error: "คุณต้องระบุชื่อบล็อก" });
   }
 
-  if (!des.length || des.length > 200) {
-    return res
-      .status(403)
-      .json({ error: "คุณต้องอธิบายบล็อกต่ำกว่า 200 ตัวอักษร" });
-  }
+  if (!draft) {
+    if (!des || des.length === 0 || des.length > 200) {
+      return res
+        .status(403)
+        .json({ error: "คุณต้องอธิบายบล็อกต่ำกว่า 200 ตัวอักษร" });
+    }
 
-  if (!banner.length) {
-    return res.status(403).json({ error: "คุณต้องใส่หน้าปกเพื่อเผยแพร่บล็อก" });
-  }
+    if (!banner || banner.length === 0) {
+      return res
+        .status(403)
+        .json({ error: "คุณต้องใส่หน้าปกเพื่อเผยแพร่บล็อก" });
+    }
 
-  if (!content.block.length) {
-    return res.status(403).json({ error: "ต้องมีเนื้อหาบล็อกเพื่อเผยแพร่" });
-  }
+    // ตรวจสอบ content.blocks
+    console.log("Content blocks:", content.blocks);
 
-  if (!tags.length || tags.length > 10) {
-    return res
-      .status(403)
-      .json({ error: "ใส่แท็กในรายการเพื่อเผยแพร่บล็อก สูงสุด 10 แท็ก" });
+    if (
+      !content ||
+      !content.blocks ||
+      !Array.isArray(content.blocks) ||
+      !content.blocks.length
+    ) {
+      return res.status(403).json({ error: "ต้องมีเนื้อหาบล็อกเพื่อเผยแพร่" });
+    }
+
+    if (!tags || tags.length === 0 || tags.length > 10) {
+      return res
+        .status(403)
+        .json({ error: "ใส่แท็กในรายการเพื่อเผยแพร่บล็อก สูงสุด 10 แท็ก" });
+    }
   }
 
   tags = tags.map((tag) => tag.toLowerCase());
@@ -66,7 +77,7 @@ router.post("/", verifyJWT, (req, res) => {
     topic,
     des,
     banner,
-    content,
+    content: content.blocks,
     tags,
     author: authorId,
     blog_id,
@@ -83,20 +94,25 @@ router.post("/", verifyJWT, (req, res) => {
           $inc: { "account_info.total_posts": incrementVal },
           $push: { blogs: blog._id },
         }
-          .then((user) => {
-            return res.status(200).json({ id: blog.blog_id });
-          })
-          .catch((err) => {
-            return res
-              .status(500)
-              .json({ error: "ข้อผิดพลาดในการอัพเดตเลขจำนวนโพสต์" });
-          })
-      );
+      )
+        .then((user) => {
+          return res.status(200).json({ id: blog.blog_id });
+        })
+        .catch((err) => {
+          return res
+            .status(500)
+            .json({ error: "ข้อผิดพลาดในการอัพเดตเลขจำนวนโพสต์" });
+        });
     })
     .catch((err) => {
-      return res.status(500).json(err.message);
+      console.error("Error occurred:", err);
+      return res
+        .status(500)
+        .json({
+          error: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์",
+          details: err.message,
+        });
     });
-  return res.json({ status: "done" });
 });
 
 module.exports = router;

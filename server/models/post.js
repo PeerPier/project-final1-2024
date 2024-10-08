@@ -10,13 +10,13 @@ const postSchema = new mongoose.Schema(
   {
     blog_id: {
       type: String,
-      required: true,
+      // required: true,
       unique: true,
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      // required: true,
     },
     topic: {
       type: String,
@@ -46,7 +46,7 @@ const postSchema = new mongoose.Schema(
     author: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: "users",
+      ref: "User",
     },
     activity: {
       total_likes: {
@@ -94,7 +94,11 @@ const postSchema = new mongoose.Schema(
       default: 0,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: {
+      createdAt: "publishedAt",
+    },
+  }
 );
 
 const Post = mongoose.model("Post", postSchema);

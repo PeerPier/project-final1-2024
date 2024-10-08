@@ -71,6 +71,8 @@ const UserAuthForm: React.FC<LoginPageProps> = ({ type }) => {
       formData[key] = value;
     });
 
+    console.log("formData:", formData);
+
     const { fullname, email, password } = formData;
     if (fullname) {
       if (fullname.length < 3) {

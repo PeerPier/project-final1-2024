@@ -148,10 +148,12 @@ const PublishForm = () => {
       topic,
       banner,
       des,
-      content,
+      content: { blocks: content.blocks },
       tags,
       draft: false,
     };
+
+    console.log("Content blocks:", content.blocks);
 
     try {
       const response = await fetch(API_URL + "/create-blog", {
@@ -163,10 +165,13 @@ const PublishForm = () => {
         body: JSON.stringify(blogObj),
       });
 
+      const responseData = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error);
+        throw new Error(responseData.error || "เกิดข้อผิดพลาดในการสร้างบล็อก");
       }
+
+      console.log("Response data:", responseData);
 
       target.classList.remove("disable");
       toast.dismiss(loadingToast);

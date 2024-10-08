@@ -8,7 +8,7 @@ import {
 import LoginPage from "./Screens/login";
 import RegistPage from "./Screens/register";
 import TestPage from "./Screens/test";
-import HomePage from "./Screens/home";
+import HomePage from "./Screens/home.page";
 import Profile from "./Screens/profile";
 import EditProfile from "./Screens/edit-profile";
 import RegisterAdmin from "./Screens/Admin/adminRegister";
@@ -87,7 +87,7 @@ function App() {
               path="/signup"
               element={<UserAuthForm type="สมัครสมาชิก" />}
             />
-            <Route path="/" element={<HomePage />} />
+            <Route index element={<HomePage />}></Route>
             <Route path="/register" element={<RegistPage />} />
             <Route path="/test" element={<TestPage />} />
             <Route path="/profile/:id" element={<Profile />} />

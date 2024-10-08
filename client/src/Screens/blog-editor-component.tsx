@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logoKKU from "../pic/logo-head.jpg";
 import "../misc/blogEdit.css";
 import AnimationWrapper from "./page-animation";
@@ -9,9 +9,17 @@ import { Toaster, toast } from "react-hot-toast";
 import { EditorContext } from "./editor-page";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
 import { tools } from "./tools.component";
+import { UserContext } from "../App";
 
 const BlogEditor = () => {
+  const API_URL = "http://localhost:3001";
   const editorContext = useContext(EditorContext);
+
+  const {
+    userAuth: { access_token },
+  } = useContext(UserContext);
+
+  const navigate = useNavigate();
 
   if (!editorContext) {
     throw new Error("EditorContext must be used within an EditorProvider");
@@ -26,14 +34,16 @@ const BlogEditor = () => {
   } = editorContext;
 
   useEffect(() => {
-    setTextEditor(
-      new EditorJS({
-        holder: "textEditor",
-        data: content,
-        tools: tools,
-        placeholder: "มาเขียนเรื่องราวสุดเจ๋งกันเถอะ!",
-      })
-    );
+    if (!textEditor?.isReady) {
+      setTextEditor(
+        new EditorJS({
+          holder: "textEditor",
+          data: content,
+          tools: tools,
+          placeholder: "มาเขียนเรื่องราวสุดเจ๋งกันเถอะ!",
+        })
+      );
+    }
   }, []);
 
   const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,19 +93,28 @@ const BlogEditor = () => {
   };
 
   const handlePublishEvent = () => {
-    if (textEditor) {
-      // ตรวจสอบว่า textEditor ไม่เป็น null
+    if (!banner.length) {
+      return toast.error("อัพโหลดแบนเนอร์เพื่อเผยแพร่");
+    }
+
+    if (!topic.length) {
+      return toast.error("เขียนหัวข้อบล็อกเพื่อเผยแพร่");
+    }
+
+    if (textEditor?.isReady) {
       textEditor
         .save()
         .then((data) => {
-          setBlog({ ...blog, content: data });
-          setEditorState("เผยแพร่");
+          if (data.blocks.length) {
+            setBlog({ ...blog, content: data });
+            setEditorState("เผยแพร่");
+          } else {
+            return toast.error("เขียนอะไรบางอย่างเพื่อเผยแพร่");
+          }
         })
         .catch((err) => {
           console.log(err);
         });
-    } else {
-      console.error("Text editor is not initialized.");
     }
   };
 
@@ -125,6 +144,62 @@ const BlogEditor = () => {
   //   }
   // };
 
+  const handleSaveDraft = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const target = e.target as HTMLButtonElement;
+
+    if (target.className.includes("disable")) {
+      return;
+    }
+
+    if (!topic.length) {
+      return toast.error("เขียนชื่อบล็อกก่อนบันทึกฉบับร่าง");
+    }
+
+    let loadingToast = toast.loading("กำลังบันทึกฉบับร่าง...");
+    target.classList.add("disable");
+
+    if (textEditor?.isReady) {
+      textEditor.save().then(async (content) => {
+        let blogObj = {
+          topic,
+          banner,
+          des,
+          content,
+          tags,
+          draft: true,
+        };
+
+        try {
+          const response = await fetch(API_URL + "/create-blog", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${access_token}`,
+            },
+            body: JSON.stringify(blogObj),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error);
+          }
+
+          target.classList.remove("disable");
+          toast.dismiss(loadingToast);
+          toast.success("บันทึกแล้ว👌");
+
+          setTimeout(() => {
+            navigate("/");
+          }, 500);
+        } catch (error: any) {
+          target.classList.remove("disable");
+          toast.dismiss(loadingToast);
+          toast.error(error.message);
+        }
+      });
+    }
+  };
+
   return (
     <>
       <nav className="navbar-navbar">
@@ -138,7 +213,9 @@ const BlogEditor = () => {
           <button className="btn-dark py-2" onClick={handlePublishEvent}>
             เผยแพร่
           </button>
-          <button className="btn-light py-2">บันทึกร่าง</button>
+          <button className="btn-light py-2" onClick={handleSaveDraft}>
+            บันทึกร่าง
+          </button>
         </div>
       </nav>
       <Toaster />
