@@ -70,8 +70,33 @@ img {
 }
 
 .blog-link {
-  text-decoration: none; /* ทำให้ไม่มีขีดเส้นใต้ */
-  color: inherit; /* สืบทอดสีจากพ่อแม่ */
+  text-decoration: none;
+  color: inherit;
+}
+
+.blog-index {
+  font-size: 2.25rem;
+  font-weight: bold;
+  color: #dcdcdc;
+  line-height: 1;
+}
+
+.trending-blog {
+  min-width: 40%;
+  max-width: min-content;
+  border-left: 1px solid grey;
+  padding-left: 2rem;
+  padding-top: 0.75rem;
+}
+
+@media (min-width: 1024px) {
+  .blog-index {
+    font-size: 3rem;
+  }
+
+  .trending-blog {
+    min-width: 400px;
+  }
 }
 
 @media (max-width: 639px) {
@@ -80,14 +105,22 @@ img {
   }
 }
 
-@media (min-width: 640px) {
+@media (max-width: 640px) {
   .blog-title {
     -webkit-line-clamp: 2;
+  }
+
+  .blog-index {
+    font-size: 1.875rem;
   }
 }
 
 @media (max-width: 768px) {
   .new-blog {
+    display: none;
+  }
+
+  .trending-blog {
     display: none;
   }
 }
