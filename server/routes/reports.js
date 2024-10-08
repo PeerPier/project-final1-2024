@@ -8,11 +8,17 @@ const Like = require("../models/like");
 router.get("/", async (req, res) => {
   try {
     const reports = await Report.find()
-      .populate("reportedBy", "firstname")
+      .populate({
+        path: "reportedBy",
+        select: "_id firstname",
+      })
       .populate({
         path: "post",
-        select: "user image topic",
-        populate: { path: "user", select: "firstname" },
+        select: "user image topic detail category contentWithImages",
+        populate: {
+          path: "user",
+          select: "_id firstname profile_picture",
+        },
       });
     res.status(200).json(reports);
   } catch (error) {

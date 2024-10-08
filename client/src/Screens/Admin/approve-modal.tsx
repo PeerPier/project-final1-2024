@@ -2,6 +2,7 @@ import React from "react";
 import { Modal, Button } from "react-bootstrap";
 import axios, { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 interface Report {
   _id: string;
@@ -10,15 +11,24 @@ interface Report {
   status: string;
   createdAt: string;
   reportedBy: {
+    _id: string;
     firstname: string;
   };
   post: {
     _id: string;
     user: {
+      _id: string;
       firstname: string;
+      profile_picture: string;
     };
     image: string;
     topic: string;
+    detail: string;
+    category: string[];
+    contentWithImages: {
+      content: string;
+      images?: string[];
+    }[];
   };
 }
 
@@ -35,6 +45,7 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
   report,
   refreshReports,
 }) => {
+  const navigate = useNavigate();
   const API_BASE_URL = "http://localhost:3001";
 
   const verifyReport = async (
@@ -117,24 +128,97 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
   };
 
   return (
-    <Modal show={showModal} onHide={handleClose}>
+    <Modal show={showModal} onHide={handleClose} size="lg">
       <Modal.Header closeButton>
         <Modal.Title>Report Details</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {report ? (
-          <>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.5rem",
+              paddingInline: "1rem",
+            }}
+          >
             <p>
-              {`${report.reportedBy.firstname} ได้รายงานโพสของ ${
-                report.post.user.firstname
-              }: ${report.reason || "No Title"}`}
+              <span
+                onClick={() => navigate(`/profile/${report.reportedBy._id}`)}
+                style={{
+                  cursor: "pointer",
+                  color: "black",
+                  textDecoration: "none",
+                }}
+              >
+                {report.reportedBy.firstname}
+              </span>{" "}
+              {`ได้รายงานโพสของ`}{" "}
+              <span
+                onClick={() => navigate(`/profile/${report.post.user._id}`)}
+                style={{
+                  cursor: "pointer",
+                  color: "black",
+                  textDecoration: "none",
+                }}
+              >
+                {report.post.user.firstname}
+              </span>{" "}
+              : {report.reason || "No Title"}
             </p>
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "1rem",
+              }}
+            >
+              <div className="profile-photo">
+                <img src={report.post.user.profile_picture || ""} alt="" />
+              </div>
+              <span
+                onClick={() => navigate(`/profile/${report.post.user._id}`)}
+                style={{
+                  cursor: "pointer",
+                  color: "black",
+                  textDecoration: "none",
+                }}
+              >
+                {report.post.user.firstname}
+              </span>
+            </span>
             <img
               src={report.post.image}
               alt={report.post.topic}
-              style={{ width: "100%", height: "auto" }}
+              style={{ width: "100%", height: "auto", borderRadius: "0.5rem" }}
             />
-          </>
+            <b>{report.post.topic}</b>
+            <div>{report.post.category.map((e) => e)}</div>
+            <p>{report.post.detail}</p>
+            {report.post.contentWithImages.map((e: any, idx: number) => {
+              return (
+                <div
+                  key={idx}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "1rem",
+                  }}
+                >
+                  <img
+                    src={e.images?.[0] || undefined}
+                    alt={report.post.topic}
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      borderRadius: "0.5rem",
+                    }}
+                  />
+                  <p>{e.content}</p>
+                </div>
+              );
+            })}
+          </div>
         ) : (
           <p>No report selected.</p>
         )}
