@@ -116,6 +116,40 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/latest-blog", (req, res) => {
+  let maxLimit = 5;
+
+  Post.find({ draft: false })
+    .populate("author", "profile_picture username fullname -_id")
+    .sort({ publishedAt: -1 })
+    .select("blog_id topic des banner activity tags publishedAt -_id")
+    .limit(maxLimit)
+    .then((blogs) => {
+      return res.status(200).json({ blogs });
+    })
+    .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
+});
+
+router.get("/trending-blogs", (req, res) => {
+  Post.find({ draft: false })
+    .populate("author", "profile_picture username fullname -_id")
+    .sort({
+      "activity.total_read": -1,
+      "activity.total_likes": -1,
+      publishedAt: -1,
+    })
+    .select("blog_id topic publishedAt -_id")
+    .limit(5)
+    .then((blogs) => {
+      return res.status(200).json({ blogs });
+    })
+    .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
+});
+
 // ดึงข้อมูลโพสต์บล็อกตาม ID
 router.get("/:id", getPost, (req, res) => {
   res.json(res.post);

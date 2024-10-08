@@ -352,11 +352,16 @@ const Feeds = () => {
                   <div className="user-name d-flex align-items-center justify-content-between mt-2">
                     <div className="user-feed d-flex align-items-center">
                       <img
-                        src={`${feed.user.profile_picture}`}
-                        alt=""
+                        src={
+                          feed?.user?.profile_picture ||
+                          "default_profile_picture.jpg"
+                        }
+                        alt="Profile"
                         style={{ margin: "0.5rem 0.5rem 0.5rem 0 " }}
                       />
-                      <h6 style={{ fontSize: "16px" }}>{feed.user.username}</h6>
+                      <h6 style={{ fontSize: "16px" }}>
+                        {feed?.user?.username || "Unknown User"}
+                      </h6>
                     </div>
                     <div className="stat-icon">
                       <IoStatsChart style={{ fontSize: "16px" }} />
@@ -365,7 +370,7 @@ const Feeds = () => {
                   <div className="detail-blog">
                     <h4>{feed.topic}</h4>
                     <div style={{ marginBottom: "10px" }}>
-                      {feed.category.map((category) => (
+                      {feed.category?.map((category) => (
                         <span
                           key={category}
                           className={`category ${getCategoryBadgeClass(
@@ -379,7 +384,7 @@ const Feeds = () => {
                     </div>
                     <p>
                       {feed.contentWithImages
-                        .map((cwi) => cwi.content)
+                        ?.map((cwi) => cwi.content)
                         .join("\n")}
                     </p>
 

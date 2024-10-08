@@ -8,9 +8,16 @@ export type ContentWithImages = {
   images: string[];
 };
 
+export interface Author {
+  fullname: string;
+  profile_picture: string;
+  username: string;
+}
+
 export type Post = {
   _id: string;
   user: User;
+  author: Author;
   comments: Comment[];
   likes: Like[];
   saves: save[];
@@ -20,8 +27,16 @@ export type Post = {
   image: string;
   images: string[];
   contentWithImages: ContentWithImages[];
+  publishedAt: string;
   createdAt: Date;
   updatedAt: Date;
   views: number;
   isSaved?: boolean;
+  tags: string;
+  des: string;
+  banner: string;
+  activity: {
+    total_likes: number;
+  };
+  blog_id: string;
 };

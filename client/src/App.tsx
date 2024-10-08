@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -8,7 +8,7 @@ import {
 import LoginPage from "./Screens/login";
 import RegistPage from "./Screens/register";
 import TestPage from "./Screens/test";
-import HomePage from "./Screens/home";
+import HomePage from "./Screens/home.page";
 import Profile from "./Screens/profile";
 import EditProfile from "./Screens/edit-profile";
 import RegisterAdmin from "./Screens/Admin/adminRegister";
@@ -29,27 +29,65 @@ import Post from "./Screens/post";
 import Chat from "./Screens/chat";
 import { ChatContextProvider } from "./Screens/ChatContext";
 import Navbar2 from "./Navbar/Navbar1";
+import Navbar from "./Navbar/Navbar";
 import EditPost from "./Screens/edit-post";
 import SearchResults from "./Navbar/SearchResults ";
 import HelpCentre from "./Screens/helpcentre";
 import Popular from "./Screens/Popular";
+import { createContext } from "react";
+import { lookInSession } from "./common/session";
+import UserAuthForm from "./Screens/UserAuthForm";
+import Editor from "./Screens/editor-page";
+
+interface UserContextType {
+  userAuth: {
+    access_token: string | null;
+    username?: string;
+    profile_picture?: string;
+  };
+  setUserAuth: React.Dispatch<React.SetStateAction<any>>;
+}
+
+export const UserContext = createContext<UserContextType>({
+  userAuth: { access_token: null },
+  setUserAuth: () => {},
+});
 
 function NavbarLayout() {
   return (
     <>
-      <Navbar2 />
+      <Navbar />
       <Outlet />
     </>
   );
 }
 
 function App() {
+  const [userAuth, setUserAuth] = useState<{ access_token: string | null }>({
+    access_token: null,
+  });
+
+  useEffect(() => {
+    const userInSession = lookInSession("user");
+
+    userInSession
+      ? setUserAuth(JSON.parse(userInSession))
+      : setUserAuth({ access_token: null });
+  }, []);
   return (
-    <ChatContextProvider>
-      <Router>
+    <UserContext.Provider value={{ userAuth, setUserAuth }}>
+      <ChatContextProvider>
         <Routes>
           <Route element={<NavbarLayout />}>
-            <Route path="/" element={<HomePage />} />
+            <Route
+              path="/signin"
+              element={<UserAuthForm type="เข้าสู่ระบบ" />}
+            />
+            <Route
+              path="/signup"
+              element={<UserAuthForm type="สมัครสมาชิก" />}
+            />
+            <Route index element={<HomePage />}></Route>
             <Route path="/register" element={<RegistPage />} />
             <Route path="/test" element={<TestPage />} />
             <Route path="/profile/:id" element={<Profile />} />
@@ -69,6 +107,7 @@ function App() {
             <Route path="/popular" element={<Popular />} />
             <Route path="/search" element={<SearchResults />} />
           </Route>
+          <Route path="/editor" element={<Editor />} />
 
           <Route path="/login" element={<LoginPage />} />
           <Route path="/admin/register" element={<RegisterAdmin />} />
@@ -82,8 +121,8 @@ function App() {
           <Route path="/chats" element={<Chat />} />
           <Route path="/nav" element={<Navbar2 />} />
         </Routes>
-      </Router>
-    </ChatContextProvider>
+      </ChatContextProvider>
+    </UserContext.Provider>
   );
 }
 

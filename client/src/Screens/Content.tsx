@@ -52,6 +52,7 @@ const Content = () => {
   );
 
   const userId = localStorage.getItem("userId");
+  console.log(post);
 
   useEffect(() => {
     async function fetchData() {
@@ -298,7 +299,7 @@ const Content = () => {
         <div className="post-container">
           <div className="head-user">
             <div className="user-info">
-              <a href={`/profile/${post.user._id}`}>{post.user.username}</a>
+              <a href={`/profile/${post.user?._id}`}>{post?.user?.username}</a>
               {dayjs(post.createdAt).format("DD/MM/YYYY HH:mm:ss")}
             </div>
 
@@ -307,10 +308,10 @@ const Content = () => {
                 <GoHeartFill
                   onClick={handleLike}
                   color={
-                    post.likes.some((l) => l.user === userId) ? "red" : "black"
+                    post.likes?.some((l) => l.user === userId) ? "red" : "black"
                   }
                 />
-                <p className="m-0">{post.likes.length} ถูกใจ</p>
+                <p className="m-0">{post?.likes?.length} ถูกใจ</p>
               </div>
 
               <div className="icon-save d-flex align-items-center">
