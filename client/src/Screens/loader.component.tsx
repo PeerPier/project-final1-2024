@@ -1,9 +1,23 @@
 const Loader = () => {
   return (
-    <div className="w-12 mx-auto my-8">
+    <div
+      style={{
+        width: "100%",
+        margin: "0 auto",
+        display: "flex", // ใช้ Flexbox
+        justifyContent: "center", // จัดกึ่งกลางในแนวนอน
+      }}
+    >
       <svg
         aria-hidden="true"
-        className="w-12 h-12 mr-2 text-white animate-spin fill-dark-grey"
+        style={{
+          width: "3rem",
+          height: "3rem",
+          marginRight: "0.5rem",
+          color: "white",
+          animation: "spin 1s linear infinite",
+          fill: "#555555",
+        }}
         viewBox="0 0 100 101"
         fill="none"
       >

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 require("../models/user");
-require("../models/post");
+require("./blog");
 
 const ReplyCommentScema = new mongoose.Schema({
   content: {

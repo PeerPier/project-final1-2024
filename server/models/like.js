@@ -1,17 +1,17 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-require('../models/user');
-require('../models/post');
+require("../models/user");
+require("./blog");
 
 const LikeSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
   },
   post: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Post',
+    ref: "Post",
     required: true,
   },
   created_at: {
@@ -20,6 +20,6 @@ const LikeSchema = new mongoose.Schema({
   },
 });
 
-const Like = mongoose.model('Like', LikeSchema);
+const Like = mongoose.model("Like", LikeSchema);
 
 module.exports = Like;

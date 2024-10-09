@@ -4,7 +4,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-const Blog = require("../models/post");
+const Blog = require("../models/blog");
 
 const verifyJWT = (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -106,12 +106,10 @@ router.post("/", verifyJWT, (req, res) => {
     })
     .catch((err) => {
       console.error("Error occurred:", err);
-      return res
-        .status(500)
-        .json({
-          error: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์",
-          details: err.message,
-        });
+      return res.status(500).json({
+        error: "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์",
+        details: err.message,
+      });
     });
 });
 

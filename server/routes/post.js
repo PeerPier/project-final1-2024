@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
-const Post = require("../models/post");
+const Post = require("../models/blog");
 const Comment = require("../models/comment");
 const Like = require("../models/like");
 const Notification = require("../models/notification");
@@ -116,13 +116,15 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/latest-blog", (req, res) => {
+router.post("/latest-blog", (req, res) => {
+  let { page } = req.body;
   let maxLimit = 5;
 
   Post.find({ draft: false })
     .populate("author", "profile_picture username fullname -_id")
     .sort({ publishedAt: -1 })
     .select("blog_id topic des banner activity tags publishedAt -_id")
+    .skip((page - 1) * maxLimit)
     .limit(maxLimit)
     .then((blogs) => {
       return res.status(200).json({ blogs });

@@ -69,6 +69,7 @@ const questionRouter = require("./routes/QuestionRoutes");
 const reportRouter = require("./routes/reports");
 const User = require("./models/user");
 const BlogCreated = require("./routes/blog");
+const Post = require("./models/blog");
 
 app.use("/signup", registerRouter);
 app.use("/signin", loginRouter);
@@ -184,6 +185,25 @@ app.post("/get-upload-picture", upload.single("file"), (req, res) => {
     console.log(err.message);
     return res.status(500).json({ error: err.message });
   }
+});
+
+app.post("/search-blogs", (req, res) => {
+  const { tag } = req.body;
+  const lowerCaseTag = tag.toLowerCase();
+  const findQuery = { tags: lowerCaseTag, draft: false };
+  const maxLimit = 5;
+
+  Post.find(findQuery)
+    .populate("author", "profile_picture username fullname -_id")
+    .sort({ publishedAt: -1 })
+    .select("blog_id topic des banner activity tags publishedAt -_id")
+    .limit(maxLimit)
+    .then((blogs) => {
+      return res.status(200).json({ blogs });
+    })
+    .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
 });
 
 // Connect to MongoDB

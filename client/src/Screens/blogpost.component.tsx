@@ -50,11 +50,17 @@ const BlogCard: React.FC<BlogCardProps> = ({ content, author }) => {
               WebkitLineClamp: "1",
               overflow: "hidden",
               textOverflow: "ellipsis",
+              fontSize: "13px",
             }}
+            
           >
             {fullname} @{username}
+            
           </p>
-          <p className="w-auto m-0"> {getDay(publishedAt)}</p>
+          <p className="w-auto m-0" style={{ fontSize: "13px" }}>
+            {" "}
+            {getDay(publishedAt)}
+          </p>
         </div>
 
         <h1 className="blog-title mt-3">{topic}</h1>

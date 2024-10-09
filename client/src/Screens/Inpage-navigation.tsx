@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import "../misc/inpage.css";
+import React from "react";
 
 interface InPageNavigationProps {
   routes: string[];
@@ -7,6 +8,9 @@ interface InPageNavigationProps {
   defaultActiveIndex?: number;
   children: ReactNode;
 }
+
+export const activeTabLineRef = React.createRef<HTMLHRElement>();
+export const activeTabRef = React.createRef<HTMLButtonElement>();
 
 const InPageNavigation: React.FC<InPageNavigationProps> = ({
   routes,

@@ -3,7 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Admin = require("../models/admin");
 const User = require("../models/user");
-const Post = require("../models/post");
+const Post = require("../models/blog");
 const jwt = require("jsonwebtoken");
 
 //Admin

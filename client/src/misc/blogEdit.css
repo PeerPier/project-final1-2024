@@ -49,19 +49,19 @@ img {
 }
 
 .blog-title {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 500;
   line-height: 1.75rem;
-  overflow: hidden;
   display: -webkit-box;
-  -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .descript-blogpost {
   margin-top: 0.75rem;
   margin-bottom: 0.75rem;
-  font-size: 1.25rem;
+  font-size: 1rem;
   line-height: 1.75rem;
   overflow: hidden;
   display: -webkit-box;
@@ -75,7 +75,7 @@ img {
 }
 
 .blog-index {
-  font-size: 2.25rem;
+  font-size: 1.5rem;
   font-weight: bold;
   color: #dcdcdc;
   line-height: 1;
@@ -84,9 +84,32 @@ img {
 .trending-blog {
   min-width: 40%;
   max-width: min-content;
-  border-left: 1px solid grey;
+  border-left: 1px solid #f0f0f0;
   padding-left: 2rem;
   padding-top: 0.75rem;
+}
+
+.tag {
+  padding: 0.75rem;
+  background-color: #f0f0f0;
+  border-radius: 9999px;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  text-transform: capitalize;
+}
+
+.tag.changeColor {
+  background-color: black;
+  color: white;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @media (min-width: 1024px) {
@@ -105,7 +128,7 @@ img {
   }
 }
 
-@media (max-width: 640px) {
+@media (min-width: 640px) {
   .blog-title {
     -webkit-line-clamp: 2;
   }

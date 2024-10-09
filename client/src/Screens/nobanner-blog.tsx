@@ -15,11 +15,11 @@ const MinimalBlogPost: React.FC<BlogCardProps> = ({ blog, index }) => {
     publishedAt,
   } = blog;
   return (
-    <Link to={`/blog/${id}`} className="blog-link d-flex gap-4 mb-4">
+    <Link to={`/blog/${id}`} className="blog-link d-flex gap-4 mb-2">
       <h1 className="blog-index">{index < 10 ? "0" + (index + 1) : index}</h1>
 
       <div>
-        <div className="d-flex gap-2 align-items-center mb-4">
+        <div className="d-flex gap-2 align-items-center mb-2">
           <img
             src={profile_picture}
             alt=""
@@ -34,11 +34,15 @@ const MinimalBlogPost: React.FC<BlogCardProps> = ({ blog, index }) => {
               WebkitLineClamp: "1",
               overflow: "hidden",
               textOverflow: "ellipsis",
+              fontSize: "13px",
             }}
           >
             {fullname} @{username}
           </p>
-          <p className="w-auto m-0"> {getDay(publishedAt)}</p>
+          <p className="w-auto m-0" style={{ fontSize: "13px" }}>
+            {" "}
+            {getDay(publishedAt)}
+          </p>
         </div>
 
         <h1 className="blog-title">{topic}</h1>

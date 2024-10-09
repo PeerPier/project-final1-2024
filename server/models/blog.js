@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
-require("../models/user");
-require("../models/comment");
-require("../models/like");
-require("../models/save");
+require("./user");
+require("./comment");
+require("./like");
+require("./save");
 
 // กำหนดโครงสร้างข้อมูลสำหรับโพสต์บล็อก
 const postSchema = new mongoose.Schema(
@@ -12,11 +12,6 @@ const postSchema = new mongoose.Schema(
       type: String,
       // required: true,
       unique: true,
-    },
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      // required: true,
     },
     topic: {
       type: String,
