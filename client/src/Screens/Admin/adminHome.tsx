@@ -38,15 +38,24 @@ interface Report {
   status: string;
   createdAt: string;
   reportedBy: {
+    _id: string;
     firstname: string;
   };
   post: {
     _id: string;
     user: {
+      _id: string;
       firstname: string;
+      profile_picture: string;
     };
     image: string;
     topic: string;
+    detail: string;
+    category: string[];
+    contentWithImages: {
+      content: string;
+      images?: string[];
+    }[];
   };
 }
 
@@ -77,6 +86,7 @@ const AdminHome: React.FC = () => {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
 
   const handleShowModal = (report: any) => {
+    console.log("report on modal:", report);
     setSelectedReport(report);
     setShowModal(true);
   };
@@ -90,6 +100,7 @@ const AdminHome: React.FC = () => {
     const fetchReports = async () => {
       try {
         const response = await axios.get("http://localhost:3001/api/report");
+        console.log(response.data); // Log the data to check the structure
         setReports(response.data);
       } catch (error) {
         console.error("Error fetching reports:", error);
