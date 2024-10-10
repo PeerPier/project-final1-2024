@@ -70,6 +70,7 @@ const reportRouter = require("./routes/reports");
 const User = require("./models/user");
 const BlogCreated = require("./routes/blog");
 const Post = require("./models/blog");
+const { count, error } = require("console");
 
 app.use("/signup", registerRouter);
 app.use("/signin", loginRouter);
@@ -170,7 +171,6 @@ app.post("/google-auth", async (req, res) => {
   }
 });
 
-// เส้นทางสำหรับการอัพโหลดภาพ
 app.post("/get-upload-picture", upload.single("file"), (req, res) => {
   try {
     if (!req.file) {
@@ -188,18 +188,60 @@ app.post("/get-upload-picture", upload.single("file"), (req, res) => {
 });
 
 app.post("/search-blogs", (req, res) => {
-  const { tag } = req.body;
-  const lowerCaseTag = tag.toLowerCase();
-  const findQuery = { tags: lowerCaseTag, draft: false };
-  const maxLimit = 5;
+  const { tag, query, page } = req.body;
+  let findQuery = { tags: tag, draft: false };
+
+  if (tag) {
+    const lowerCaseTag = tag.toLowerCase();
+    findQuery = { tags: lowerCaseTag, draft: false };
+  } else {
+    findQuery = { draft: false, topic: new RegExp(query, "i") };
+  }
+  const maxLimit = 2;
 
   Post.find(findQuery)
     .populate("author", "profile_picture username fullname -_id")
     .sort({ publishedAt: -1 })
     .select("blog_id topic des banner activity tags publishedAt -_id")
+    .skip((page - 1) * maxLimit)
     .limit(maxLimit)
     .then((blogs) => {
       return res.status(200).json({ blogs });
+    })
+    .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
+});
+
+app.post("/search-blogs-count", (req, res) => {
+  const { tag, query } = req.body;
+  let findQuery;
+
+  if (tag) {
+    const lowerCaseTag = tag.toLowerCase();
+    findQuery = { tags: lowerCaseTag, draft: false };
+  } else {
+    findQuery = { draft: false, topic: new RegExp(query, "i") };
+  }
+
+  Post.countDocuments(findQuery)
+    .then((count) => {
+      return res.status(200).json({ totalDocs: count });
+    })
+    .catch((err) => {
+      console.log(err.message);
+      return res.status(500).json({ error: err.message });
+    });
+});
+
+app.post("/search-users", (req, res) => {
+  let { query } = req.body;
+
+  User.find({ username: new RegExp(query, "i") })
+    .limit(50)
+    .select("fullname username profile_picture -_id")
+    .then((users) => {
+      return res.status(200).json({ users });
     })
     .catch((err) => {
       return res.status(500).json({ error: err.message });

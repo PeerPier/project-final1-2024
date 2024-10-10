@@ -134,6 +134,17 @@ router.post("/latest-blog", (req, res) => {
     });
 });
 
+router.post("/all-latest-blogs-count", (req, res) => {
+  Post.countDocuments({ draft: false })
+    .then((count) => {
+      return res.status(200).json({ totalDocs: count });
+    })
+    .catch((err) => {
+      console.log(err.message);
+      return res.status(500).json({ error: err.message });
+    });
+});
+
 router.get("/trending-blogs", (req, res) => {
   Post.find({ draft: false })
     .populate("author", "profile_picture username fullname -_id")

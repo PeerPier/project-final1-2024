@@ -64,6 +64,11 @@
   font-size: 16px;
 }
 
+.search-input:focus {
+  outline: none;
+  border: 2px solid #cb6ce6;
+}
+
 .icon-search {
   position: absolute;
   right: 10%;

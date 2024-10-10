@@ -60,7 +60,7 @@ const InPageNavigation: React.FC<InPageNavigationProps> = ({
             </button>
           );
         })}
-        <hr ref={activeTabLineRef} className="underline m-0" />
+        <hr ref={activeTabLineRef} className="underline-hr m-0" />
       </div>
 
       {Array.isArray(children) ? children[inPageNavIndex] : children}

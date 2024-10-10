@@ -38,6 +38,9 @@ import { createContext } from "react";
 import { lookInSession } from "./common/session";
 import UserAuthForm from "./Screens/UserAuthForm";
 import Editor from "./Screens/editor-page";
+import SearchPage from "./Screens/search.page";
+import PageNotFound from "./Screens/404";
+import ProfilePage from "./Screens/ProfilePage";
 
 interface UserContextType {
   userAuth: {
@@ -87,8 +90,11 @@ function App() {
               path="/signup"
               element={<UserAuthForm type="สมัครสมาชิก" />}
             />
-            <Route index element={<HomePage />}></Route>
-            <Route path="/register" element={<RegistPage />} />
+            <Route index element={<HomePage />} />
+            <Route path="/search/:query" element={<SearchPage />} />
+            <Route path="*" element={<PageNotFound />} />
+            <Route path="/user/:id" element={<ProfilePage />} />
+
             <Route path="/test" element={<TestPage />} />
             <Route path="/profile/:id" element={<Profile />} />
             <Route path="/profile/edit-profile/:id" element={<EditProfile />} />

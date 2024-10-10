@@ -567,7 +567,7 @@ const Content = () => {
                                             marginRight: "5px",
                                           }}
                                         >
-                                          {reply.replyTo.firstname}
+                                          {reply.replyTo.fullname}
                                         </a>
                                         <span
                                           dangerouslySetInnerHTML={{

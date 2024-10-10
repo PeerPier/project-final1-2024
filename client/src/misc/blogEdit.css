@@ -49,7 +49,7 @@ img {
 }
 
 .blog-title {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 500;
   line-height: 1.75rem;
   display: -webkit-box;
@@ -112,6 +112,27 @@ img {
   }
 }
 
+.loadmore {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #282828;
+}
+
+.loadmore:hover {
+  background-color: rgba(128, 128, 128, 0.3);
+}
+
+.userSearch {
+  min-width: 40%;
+  border-left: 1px solid #f0f0f0;
+  padding-left: 2rem;
+  padding-top: 0.75rem;
+  max-width: min-content;
+}
+
 @media (min-width: 1024px) {
   .blog-index {
     font-size: 3rem;
@@ -119,6 +140,10 @@ img {
 
   .trending-blog {
     min-width: 400px;
+  }
+
+  .userSearch {
+    min-width: 350px;
   }
 }
 
@@ -144,6 +169,10 @@ img {
   }
 
   .trending-blog {
+    display: none;
+  }
+
+  .userSearch {
     display: none;
   }
 }

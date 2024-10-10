@@ -9,10 +9,18 @@ import MinimalBlogPost from "./nobanner-blog";
 import { MdAutoGraph } from "react-icons/md";
 import { activeTabRef } from "./Inpage-navigation";
 import NoDataMessage from "./nodata.component";
+import { filterPaginationData } from "./filter-pagination";
+import LoadMoreDataBtn from "./load-more.component";
+
+interface BlogState {
+  result: Post[];
+  totalDocs: number;
+  page: number;
+}
 
 const HomePage = () => {
   const API_URL = "http://localhost:3001";
-  const [blogs, setBlogs] = useState<Post[] | null>(null);
+  const [blogs, setBlogs] = useState<BlogState | null>(null);
   const [trendingBlogs, setTrendingBlogs] = useState<Post[] | null>(null);
   const [pageState, setPageState] = useState("หน้าหลัก");
   const category = [
@@ -39,23 +47,38 @@ const HomePage = () => {
     setPageState(categories);
   };
 
-  const fetchLatestBlogs = (page = 1 ) => {
+  const fetchLatestBlogs = ({ page = 1 }) => {
     axios
       .post(API_URL + "/posts/latest-blog", { page })
-      .then(({ data }) => {
-        console.log(data);
-        // setBlogs(data.blogs);
+      .then(async ({ data }) => {
+        console.log(data.blogs);
+
+        let formatData = await filterPaginationData({
+          state: blogs,
+          data: data.blogs,
+          page,
+          countRoute: "/posts/all-latest-blogs-count",
+        });
+        setBlogs(formatData);
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
-  const fetchBlogsByCategory = () => {
+  const fetchBlogsByCategory = ({ page = 1 }) => {
     axios
-      .post(API_URL + "/search-blogs", { tag: pageState })
-      .then(({ data }) => {
-        setBlogs(data.blogs);
+      .post(API_URL + "/search-blogs", { tag: pageState, page })
+      .then(async ({ data }) => {
+        let formatData = await filterPaginationData({
+          state: blogs,
+          data: data.blogs,
+          page,
+          countRoute: "/search-blogs-count",
+          data_to_send: {tag: pageState},
+        });
+
+        setBlogs(formatData);
       })
       .catch((err) => {
         console.log(err);
@@ -77,9 +100,9 @@ const HomePage = () => {
     activeTabRef.current?.click();
 
     if (pageState === "หน้าหลัก") {
-      fetchLatestBlogs();
+      fetchLatestBlogs({ page: 1 });
     } else {
-      fetchBlogsByCategory();
+      fetchBlogsByCategory({ page: 1 });
     }
 
     if (!trendingBlogs) {
@@ -101,8 +124,8 @@ const HomePage = () => {
             <>
               {blogs === null ? (
                 <Loader />
-              ) : blogs.length ? (
-                blogs.map((blog, i) => {
+              ) : blogs.result.length ? (
+                blogs.result.map((blog, i) => {
                   return (
                     <AnimationWrapper
                       transition={{ duration: 1, delay: i * 0.1 }}
@@ -115,6 +138,7 @@ const HomePage = () => {
               ) : (
                 <NoDataMessage message="ไม่มีบล็อกที่เผยแพร่" />
               )}
+              <LoadMoreDataBtn state={blogs} fetchDataFun={(pageState === "หน้าหลัก" ? fetchLatestBlogs : fetchBlogsByCategory)} />
             </>
             {trendingBlogs === null ? (
               <Loader />

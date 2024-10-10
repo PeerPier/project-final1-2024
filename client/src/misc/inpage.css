@@ -28,7 +28,7 @@ section {
   color: rgb(101, 101, 101);
 }
 
-.underline {
+.underline-hr {
   position: absolute;
   bottom: 0;
   transition-duration: 300ms;

@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import "./Navbar.css";
 import logoKKU from "../pic/logo-head.jpg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IoIosSearch } from "react-icons/io";
 import { LuFileEdit } from "react-icons/lu";
 import { UserContext } from "../App";
@@ -11,12 +11,25 @@ import UserNavigationPanel from "../Screens/user-navigation.component";
 function Navbar() {
   const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
   const [userNavPanel, setUserNavPanel] = useState(false);
+  const navigate = useNavigate();
+
   const {
     userAuth: { access_token, profile_picture },
   } = useContext(UserContext);
+
   const handleNavpanel = () => {
     setUserNavPanel((currentVal) => !currentVal);
   };
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    console.log(e);
+    const query = e.currentTarget.value;
+
+    if (e.key === "Enter" && query.length) {
+      navigate(`/search/${query}`);
+    }
+  };
+
   const handleBlur = () => {
     setTimeout(() => {
       setUserNavPanel(false);
@@ -32,7 +45,12 @@ function Navbar() {
       <div
         className={`search-container ${searchBoxVisibility ? "show" : "hide"} `}
       >
-        <input type="text" placeholder="Search..." className="search-input" />
+        <input
+          type="text"
+          placeholder="Search..."
+          className="search-input"
+          onKeyDown={handleSearch}
+        />
         <IoIosSearch className="icon-search" />
       </div>
 

@@ -8,12 +8,12 @@ interface BlogCardProps {
 }
 
 const MinimalBlogPost: React.FC<BlogCardProps> = ({ blog, index }) => {
-  const {
-    topic,
-    blog_id: id,
-    author: { fullname, username, profile_picture },
-    publishedAt,
-  } = blog;
+  const { topic, blog_id: id, author, publishedAt } = blog;
+
+  const fullname = author?.fullname || "ไม่ทราบผู้เขียน";
+  const username = author?.username || "ไม่ทราบชื่อผู้ใช้";
+  const profile_picture = author?.profile_picture || "default-image.jpg";
+
   return (
     <Link to={`/blog/${id}`} className="blog-link d-flex gap-4 mb-2">
       <h1 className="blog-index">{index < 10 ? "0" + (index + 1) : index}</h1>
@@ -27,22 +27,19 @@ const MinimalBlogPost: React.FC<BlogCardProps> = ({ blog, index }) => {
             style={{ height: "24px", width: "24px" }}
           />
           <p
-            className="m-0"
+            className="m-0 fw-medium"
             style={{
               display: "-webkit-box",
               WebkitBoxOrient: "vertical",
               WebkitLineClamp: "1",
               overflow: "hidden",
               textOverflow: "ellipsis",
-              fontSize: "13px",
+              width: "220px",
             }}
           >
             {fullname} @{username}
           </p>
-          <p className="w-auto m-0" style={{ fontSize: "13px" }}>
-            {" "}
-            {getDay(publishedAt)}
-          </p>
+          <p className="w-auto m-0 fw-medium"> {getDay(publishedAt)}</p>
         </div>
 
         <h1 className="blog-title">{topic}</h1>

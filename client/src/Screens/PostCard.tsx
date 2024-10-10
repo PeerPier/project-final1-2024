@@ -82,7 +82,7 @@ const PostCard = ({ feed }: { feed: Post }) => {
             }}
           >
             <div style={{ fontWeight: "bold", marginRight: "7px" }}>
-              {feed.user.firstname} {feed.user.lastname}
+              {feed.user.fullname}
             </div>
             <div style={{ color: "grey" }}>
               {dayjs(feed.createdAt).format("DD/MM/YYYY")}

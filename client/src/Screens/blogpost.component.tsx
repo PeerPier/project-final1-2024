@@ -43,24 +43,18 @@ const BlogCard: React.FC<BlogCardProps> = ({ content, author }) => {
             style={{ height: "24px", width: "24px" }}
           />
           <p
-            className="m-0"
+            className="m-0 fw-medium"
             style={{
               display: "-webkit-box",
               WebkitBoxOrient: "vertical",
               WebkitLineClamp: "1",
               overflow: "hidden",
               textOverflow: "ellipsis",
-              fontSize: "13px",
             }}
-            
           >
             {fullname} @{username}
-            
           </p>
-          <p className="w-auto m-0" style={{ fontSize: "13px" }}>
-            {" "}
-            {getDay(publishedAt)}
-          </p>
+          <p className="w-auto m-0 fw-medium"> {getDay(publishedAt)}</p>
         </div>
 
         <h1 className="blog-title mt-3">{topic}</h1>
