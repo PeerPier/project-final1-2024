@@ -249,7 +249,7 @@ const BlogEditor = () => {
               onChange={handleTitleChange}
             ></textarea>
 
-            <hr className="w-100 my-5" style={{ opacity: "0.1" }} />
+            <hr className="w-100 my-1" style={{ opacity: "0.1" }} />
 
             <div id="textEditor"></div>
           </div>

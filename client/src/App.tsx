@@ -41,6 +41,7 @@ import Editor from "./Screens/editor-page";
 import SearchPage from "./Screens/search.page";
 import PageNotFound from "./Screens/404";
 import ProfilePage from "./Screens/ProfilePage";
+import BlogPage from "./Screens/blog.page";
 
 interface UserContextType {
   userAuth: {
@@ -94,6 +95,7 @@ function App() {
             <Route path="/search/:query" element={<SearchPage />} />
             <Route path="*" element={<PageNotFound />} />
             <Route path="/user/:id" element={<ProfilePage />} />
+            <Route path="/blog/:blog_id" element={<BlogPage/>}></Route>
 
             <Route path="/test" element={<TestPage />} />
             <Route path="/profile/:id" element={<Profile />} />

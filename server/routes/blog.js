@@ -113,4 +113,23 @@ router.post("/", verifyJWT, (req, res) => {
     });
 });
 
+router.post("/get-blog", (req, res) => {
+  let { blog_id } = req.body;
+
+  let incrementVal = 1;
+
+  Blog.findOneAndUpdate(
+    { blog_id },
+    { $inc: { "activity.total_reads": incrementVal } }
+  )
+    .populate("author", "fullname username profile_picture")
+    .select("topic des content banner activity publishedAt blog_id tags")
+    .then((blog) => {
+      return res.status(200).json({ blog });
+    })
+    .catch(err => {
+      return res.status(500).json({"error": err.message})
+    })
+});
+
 module.exports = router;

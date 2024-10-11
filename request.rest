@@ -1,5 +1,6 @@
-POST http://localhost:3001/search-users
+POST http://localhost:3001/users/get-profile
+Content-Type: application/json
 
 {
-    "query": "piya"
+    "username": "piyarat.up"
 }

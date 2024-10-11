@@ -141,7 +141,11 @@ const userSchema = new mongoose.Schema(
       default: [],
     },
   },
-  { timestamps: true }
+  {
+    timestamps: {
+      createdAt: "joinedAt",
+    },
+  }
 );
 
 const User = mongoose.model("User", userSchema);

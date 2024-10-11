@@ -188,14 +188,16 @@ app.post("/get-upload-picture", upload.single("file"), (req, res) => {
 });
 
 app.post("/search-blogs", (req, res) => {
-  const { tag, query, page } = req.body;
+  const { tag, author, query, page } = req.body;
   let findQuery = { tags: tag, draft: false };
 
   if (tag) {
     const lowerCaseTag = tag.toLowerCase();
     findQuery = { tags: lowerCaseTag, draft: false };
-  } else {
+  } else if (query) {
     findQuery = { draft: false, topic: new RegExp(query, "i") };
+  } else if (author) {
+    findQuery = { author, draft: false };
   }
   const maxLimit = 2;
 
@@ -214,14 +216,16 @@ app.post("/search-blogs", (req, res) => {
 });
 
 app.post("/search-blogs-count", (req, res) => {
-  const { tag, query } = req.body;
+  const { tag, query, author } = req.body;
   let findQuery;
 
   if (tag) {
     const lowerCaseTag = tag.toLowerCase();
     findQuery = { tags: lowerCaseTag, draft: false };
-  } else {
+  } else if (query) {
     findQuery = { draft: false, topic: new RegExp(query, "i") };
+  } else if (author) {
+    findQuery = { author, draft: false };
   }
 
   Post.countDocuments(findQuery)

@@ -53,3 +53,18 @@
   position: absolute;
   transform: translate(8%, -50%);
 }
+.hover\:text-black:hover {
+  color: black; /* เปลี่ยนสีเป็นสีดำเมื่อ hover */
+}
+
+.icon-social-link > * {
+  margin-right: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .about-user {
+    width: 90%;
+    margin-top: 1.5rem;
+  }
+}

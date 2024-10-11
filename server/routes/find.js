@@ -49,4 +49,19 @@ router.get("/find/:userId", async (req, res) => {
   }
 });
 
+router.post("/get-profile", (req, res) => {
+  let { username } = req.body;
+  console.log(req.body);
+
+  User.findOne({ username: username })
+    .select("-password -google_auth -updatedAt -blogs")
+    .then((user) => {
+      return res.status(200).json(user);
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(500).json({ error: err.message });
+    });
+});
+
 module.exports = router;
