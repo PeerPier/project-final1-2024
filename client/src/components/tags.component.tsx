@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { MdClose } from "react-icons/md";
-import { EditorContext } from "./editor-page";
+import { EditorContext } from "../Screens/editor-page";
 
 interface TagProps {
   tag: string;

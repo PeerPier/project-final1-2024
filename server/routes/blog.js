@@ -46,15 +46,7 @@ router.post("/", verifyJWT, (req, res) => {
         .json({ error: "คุณต้องใส่หน้าปกเพื่อเผยแพร่บล็อก" });
     }
 
-    // ตรวจสอบ content.blocks
-    console.log("Content blocks:", content.blocks);
-
-    if (
-      !content ||
-      !content.blocks ||
-      !Array.isArray(content.blocks) ||
-      !content.blocks.length
-    ) {
+    if (!content.blocks.length) {
       return res.status(403).json({ error: "ต้องมีเนื้อหาบล็อกเพื่อเผยแพร่" });
     }
 
@@ -77,7 +69,7 @@ router.post("/", verifyJWT, (req, res) => {
     topic,
     des,
     banner,
-    content: content.blocks,
+    content,
     tags,
     author: authorId,
     blog_id,
@@ -125,11 +117,18 @@ router.post("/get-blog", (req, res) => {
     .populate("author", "fullname username profile_picture")
     .select("topic des content banner activity publishedAt blog_id tags")
     .then((blog) => {
+      User.findOneAndUpdate(
+        { username: blog.author.username },
+        { $inc: { total_reads: incrementVal } }
+      ).catch((err) => {
+        return res.status(500).json({ error: err.message });
+      });
+
       return res.status(200).json({ blog });
     })
-    .catch(err => {
-      return res.status(500).json({"error": err.message})
-    })
+    .catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
 });
 
 module.exports = router;

@@ -16,27 +16,34 @@ export interface Author {
 
 export type Post = {
   _id: string;
+  blog_id: string;
   user: User;
   author: Author;
   comments: Comment[];
+  content: [
+    {
+      blocks: [];
+      time: number;
+      version: string;
+    }
+  ];
   likes: Like[];
   saves: save[];
   topic: string;
-  detail: string;
+  detail?: string;
   category: string[];
   image: string;
   images: string[];
   contentWithImages: ContentWithImages[];
   publishedAt: string;
-  createdAt: Date;
-  updatedAt: Date;
-  views: number;
+  createdAt: string;
   isSaved?: boolean;
+  views: number;
   tags: string;
   des: string;
   banner: string;
   activity: {
     total_likes: number;
+    total_comments: number;
   };
-  blog_id: string;
 };

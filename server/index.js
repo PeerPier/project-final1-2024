@@ -70,7 +70,6 @@ const reportRouter = require("./routes/reports");
 const User = require("./models/user");
 const BlogCreated = require("./routes/blog");
 const Post = require("./models/blog");
-const { count, error } = require("console");
 
 app.use("/signup", registerRouter);
 app.use("/signin", loginRouter);
@@ -188,18 +187,18 @@ app.post("/get-upload-picture", upload.single("file"), (req, res) => {
 });
 
 app.post("/search-blogs", (req, res) => {
-  const { tag, author, query, page } = req.body;
+  const { tag, author, query, page, limit, eliminate_blog } = req.body;
   let findQuery = { tags: tag, draft: false };
 
   if (tag) {
     const lowerCaseTag = tag.toLowerCase();
-    findQuery = { tags: lowerCaseTag, draft: false };
+    findQuery = { tags: lowerCaseTag, draft: false, blog_id: {$ne: eliminate_blog} };
   } else if (query) {
     findQuery = { draft: false, topic: new RegExp(query, "i") };
   } else if (author) {
     findQuery = { author, draft: false };
   }
-  const maxLimit = 2;
+  const maxLimit = limit ? limit : 2;
 
   Post.find(findQuery)
     .populate("author", "profile_picture username fullname -_id")

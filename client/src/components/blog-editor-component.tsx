@@ -1,15 +1,16 @@
 import { Link, useNavigate } from "react-router-dom";
 import logoKKU from "../pic/logo-head.jpg";
 import "../misc/blogEdit.css";
-import AnimationWrapper from "./page-animation";
 import defaultBanner from "../pic/blog banner.png";
 import { uploadImage } from "../common/b2";
 import { useContext, useEffect, useRef } from "react";
 import { Toaster, toast } from "react-hot-toast";
-import { EditorContext } from "./editor-page";
+
 import EditorJS, { OutputData } from "@editorjs/editorjs";
-import { tools } from "./tools.component";
+import { tools } from "../components/tools.component";
 import { UserContext } from "../App";
+import AnimationWrapper from "../Screens/page-animation";
+import { EditorContext } from "../Screens/editor-page";
 
 const BlogEditor = () => {
   const API_URL = "http://localhost:3001";

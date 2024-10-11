@@ -6,7 +6,7 @@ import { IoIosSearch } from "react-icons/io";
 import { LuFileEdit } from "react-icons/lu";
 import { UserContext } from "../App";
 import { IoNotificationsOutline } from "react-icons/io5";
-import UserNavigationPanel from "../Screens/user-navigation.component";
+import UserNavigationPanel from "../components/user-navigation.component";
 
 function Navbar() {
   const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);

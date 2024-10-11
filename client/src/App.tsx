@@ -31,7 +31,7 @@ import { ChatContextProvider } from "./Screens/ChatContext";
 import Navbar2 from "./Navbar/Navbar1";
 import Navbar from "./Navbar/Navbar";
 import EditPost from "./Screens/edit-post";
-import SearchResults from "./Navbar/SearchResults ";
+// import SearchResults from "./Navbar/SearchResults ";
 import HelpCentre from "./Screens/helpcentre";
 import Popular from "./Screens/Popular";
 import { createContext } from "react";
@@ -95,7 +95,7 @@ function App() {
             <Route path="/search/:query" element={<SearchPage />} />
             <Route path="*" element={<PageNotFound />} />
             <Route path="/user/:id" element={<ProfilePage />} />
-            <Route path="/blog/:blog_id" element={<BlogPage/>}></Route>
+            <Route path="/blog/:blog_id" element={<BlogPage />}></Route>
 
             <Route path="/test" element={<TestPage />} />
             <Route path="/profile/:id" element={<Profile />} />
@@ -113,7 +113,7 @@ function App() {
             <Route path="/content/:id" element={<Content />} />
             <Route path="/category" element={<Category />} />
             <Route path="/popular" element={<Popular />} />
-            <Route path="/search" element={<SearchResults />} />
+            {/* <Route path="/search" element={<SearchResults />} /> */}
           </Route>
           <Route path="/editor" element={<Editor />} />
 

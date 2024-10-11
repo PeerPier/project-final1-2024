@@ -1,17 +1,17 @@
 import { useParams } from "react-router-dom";
-import InPageNavigation from "./Inpage-navigation";
+import InPageNavigation from "../components/Inpage-navigation";
 import { useEffect, useState } from "react";
 import { Post } from "../types/post";
-import Loader from "./loader.component";
+import Loader from "../components/loader.component";
 import AnimationWrapper from "./page-animation";
-import BlogCard from "./blogpost.component";
-import NoDataMessage from "./nodata.component";
-import LoadMoreDataBtn from "./load-more.component";
+import BlogCard from "../components/blogpost.component";
+import NoDataMessage from "../components/nodata.component";
+import LoadMoreDataBtn from "../components/load-more.component";
 import axios from "axios";
 import { API_BASE_URL } from "../api/post";
-import { filterPaginationData } from "./filter-pagination";
+import { filterPaginationData } from "../components/filter-pagination";
 import { User } from "../types/user";
-import UserCard from "./usercard.component";
+import UserCard from "../components/usercard.component";
 import { LuUser2 } from "react-icons/lu";
 
 interface BlogState {

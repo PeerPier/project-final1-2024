@@ -1,5 +1,5 @@
 import "../misc/signup.css";
-import InputBox from "./input.component";
+import InputBox from "../components/input.component";
 import googleIcon from "../pic/google.png";
 import { Link, Navigate } from "react-router-dom";
 import AnimationWrapper from "./page-animation";

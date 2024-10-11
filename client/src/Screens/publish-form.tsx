@@ -4,9 +4,10 @@ import { MdClose } from "react-icons/md";
 import { useContext } from "react";
 import { EditorContext } from "./editor-page";
 import "../misc/publish-form.css";
-import Tag from "./tags.component";
 import { UserContext } from "../App";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import Tag from "../components/tags.component";
 
 const PublishForm = () => {
   const characterLimit = 200;
@@ -69,78 +70,22 @@ const PublishForm = () => {
     }
   };
 
-  // const publishBlog = (e: React.MouseEvent<HTMLButtonElement>) => {
-  //   const target = e.target as HTMLButtonElement;
-  //   if (target.className.includes("disable")) {
-  //     return;
-  //   }
-  //   if (!topic.length) {
-  //     return toast.error("เขียนชื่อบล็อกก่อนเผยแพร่");
-  //   }
-  //   if (!des.length || des.length > characterLimit) {
-  //     return toast.error(
-  //       `เขียนรายละเอียดเกี่ยวกับบล็อกของคุณภายใน ${characterLimit} ตัวอักษรก่อนเผยแพร่`
-  //     );
-  //   }
-  //   if (!tags.length) {
-  //     return toast.error("กรอกอย่างน้อย 1 แท็ก เพื่อช่วยจัดอันดับบล็อกของคุณ");
-  //   }
-  //   let loadingToast = toast.loading("กำลังเผยแพร่...");
-  //   target.classList.add("disable");
-
-  //   let blogObj = {
-  //     topic,
-  //     banner,
-  //     des,
-  //     content,
-  //     tags,
-  //     draft: false,
-  //   };
-  //   axios.post(API_URL + "/create-blog", blogObj, {
-  //     headers: {
-  //       'Authorization' : `Bearer ${access_token}`
-  //     }
-  //   })
-  //   .then(() => {
-  //     target.classList.remove("disable"
-
-  //       toast.dismiss(loadingToast);
-  //       toast.success("เผยแพร่แล้ว")
-
-  //       setTimeout(() => {
-  //         navigate("/")
-  //       }, 500)
-  //     )
-  //   })
-  //   .catch(({response}) => {
-  //     target.classList.remove("disable")
-  //     toast.dismiss(loadingToast);
-
-  //     return toast.error(response.data.error)
-  //   })
-  // };
-
-  const publishBlog = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const publishBlog = (e: React.MouseEvent<HTMLButtonElement>) => {
     const target = e.target as HTMLButtonElement;
-
     if (target.className.includes("disable")) {
       return;
     }
-
     if (!topic.length) {
       return toast.error("เขียนชื่อบล็อกก่อนเผยแพร่");
     }
-
     if (!des.length || des.length > characterLimit) {
       return toast.error(
         `เขียนรายละเอียดเกี่ยวกับบล็อกของคุณภายใน ${characterLimit} ตัวอักษรก่อนเผยแพร่`
       );
     }
-
     if (!tags.length) {
       return toast.error("กรอกอย่างน้อย 1 แท็ก เพื่อช่วยจัดอันดับบล็อกของคุณ");
     }
-
     let loadingToast = toast.loading("กำลังเผยแพร่...");
     target.classList.add("disable");
 
@@ -148,44 +93,100 @@ const PublishForm = () => {
       topic,
       banner,
       des,
-      content: { blocks: content.blocks },
+      content,
       tags,
       draft: false,
     };
-
-    console.log("Content blocks:", content.blocks);
-
-    try {
-      const response = await fetch(API_URL + "/create-blog", {
-        method: "POST",
+    axios
+      .post(API_URL + "/create-blog", blogObj, {
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${access_token}`,
         },
-        body: JSON.stringify(blogObj),
+      })
+      .then(() => {
+        target.classList.remove("disable");
+
+        toast.dismiss(loadingToast);
+        toast.success("เผยแพร่แล้ว");
+
+        setTimeout(() => {
+          navigate("/");
+        }, 500);
+      })
+      .catch(({ response }) => {
+        target.classList.remove("disable");
+        toast.dismiss(loadingToast);
+
+        return toast.error(response.data.error);
       });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.error || "เกิดข้อผิดพลาดในการสร้างบล็อก");
-      }
-
-      console.log("Response data:", responseData);
-
-      target.classList.remove("disable");
-      toast.dismiss(loadingToast);
-      toast.success("เผยแพร่แล้ว");
-
-      setTimeout(() => {
-        navigate("/");
-      }, 500);
-    } catch (error: any) {
-      target.classList.remove("disable");
-      toast.dismiss(loadingToast);
-      toast.error(error.message);
-    }
   };
+
+  // const publishBlog = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  //   const target = e.target as HTMLButtonElement;
+
+  //   if (target.className.includes("disable")) {
+  //     return;
+  //   }
+
+  //   if (!topic.length) {
+  //     return toast.error("เขียนชื่อบล็อกก่อนเผยแพร่");
+  //   }
+
+  //   if (!des.length || des.length > characterLimit) {
+  //     return toast.error(
+  //       `เขียนรายละเอียดเกี่ยวกับบล็อกของคุณภายใน ${characterLimit} ตัวอักษรก่อนเผยแพร่`
+  //     );
+  //   }
+
+  //   if (!tags.length) {
+  //     return toast.error("กรอกอย่างน้อย 1 แท็ก เพื่อช่วยจัดอันดับบล็อกของคุณ");
+  //   }
+
+  //   let loadingToast = toast.loading("กำลังเผยแพร่...");
+  //   target.classList.add("disable");
+
+  //   let blogObj = {
+  //     topic,
+  //     banner,
+  //     des,
+  //     content: { blocks: content.blocks },
+  //     tags,
+  //     draft: false,
+  //   };
+
+  //   console.log("Content blocks:", content);
+
+  //   try {
+  //     const response = await fetch(API_URL + "/create-blog", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${access_token}`,
+  //       },
+  //       body: JSON.stringify(blogObj),
+  //     });
+
+  //     const responseData = await response.json();
+
+  //     if (!response.ok) {
+  //       throw new Error(responseData.error || "เกิดข้อผิดพลาดในการสร้างบล็อก");
+  //     }
+
+  //     console.log("Response data:", responseData);
+
+  //     target.classList.remove("disable");
+  //     toast.dismiss(loadingToast);
+  //     toast.success("เผยแพร่แล้ว");
+
+  //     setTimeout(() => {
+  //       navigate("/");
+  //     }, 500);
+  //   } catch (error: any) {
+  //     target.classList.remove("disable");
+  //     toast.dismiss(loadingToast);
+  //     toast.error(error.message);
+  //   }
+  // };
 
   return (
     <AnimationWrapper>

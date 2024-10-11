@@ -3,18 +3,18 @@ import { useContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { API_BASE_URL } from "../api/post";
 import AnimationWrapper from "./page-animation";
-import Loader from "./loader.component";
+import Loader from "../components/loader.component";
 import "../misc/profile.css";
 import { UserContext } from "../App";
-import AboutUser from "./about.component";
+import AboutUser from "../components/about.component";
 import { Post } from "../types/post";
-import { filterPaginationData } from "./filter-pagination";
-import InpageNavigation from "./Inpage-navigation";
-import BlogCard from "./blogpost.component";
-import NoDataMessage from "./nodata.component";
-import LoadMoreDataBtn from "./load-more.component";
+import { filterPaginationData } from "../components/filter-pagination";
+import InpageNavigation from "../components/Inpage-navigation";
+import BlogCard from "../components/blogpost.component";
+import NoDataMessage from "../components/nodata.component";
+import LoadMoreDataBtn from "../components/load-more.component";
 import MinimalBlogPost from "./nobanner-blog";
-import InPageNavigation from "./Inpage-navigation";
+import InPageNavigation from "../components/Inpage-navigation";
 import PageNotFound from "./404";
 
 export const profileData = {

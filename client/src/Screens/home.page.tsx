@@ -1,16 +1,16 @@
 import AnimationWrapper from "./page-animation";
-import InPageNavigation from "./Inpage-navigation";
+import InPageNavigation from "../components/Inpage-navigation";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import Loader from "./loader.component";
+import Loader from "../components/loader.component";
 import { Post } from "../types/post";
-import BlogCard from "./blogpost.component";
+import BlogCard from "../components/blogpost.component";
 import MinimalBlogPost from "./nobanner-blog";
 import { MdAutoGraph } from "react-icons/md";
-import { activeTabRef } from "./Inpage-navigation";
-import NoDataMessage from "./nodata.component";
-import { filterPaginationData } from "./filter-pagination";
-import LoadMoreDataBtn from "./load-more.component";
+import { activeTabRef } from "../components/Inpage-navigation";
+import NoDataMessage from "../components/nodata.component";
+import { filterPaginationData } from "../components/filter-pagination";
+import LoadMoreDataBtn from "../components/load-more.component";
 
 interface BlogState {
   result: Post[];
@@ -75,7 +75,7 @@ const HomePage = () => {
           data: data.blogs,
           page,
           countRoute: "/search-blogs-count",
-          data_to_send: {tag: pageState},
+          data_to_send: { tag: pageState },
         });
 
         setBlogs(formatData);
@@ -138,7 +138,14 @@ const HomePage = () => {
               ) : (
                 <NoDataMessage message="ไม่มีบล็อกที่เผยแพร่" />
               )}
-              <LoadMoreDataBtn state={blogs} fetchDataFun={(pageState === "หน้าหลัก" ? fetchLatestBlogs : fetchBlogsByCategory)} />
+              <LoadMoreDataBtn
+                state={blogs}
+                fetchDataFun={
+                  pageState === "หน้าหลัก"
+                    ? fetchLatestBlogs
+                    : fetchBlogsByCategory
+                }
+              />
             </>
             {trendingBlogs === null ? (
               <Loader />

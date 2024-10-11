@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
-import AnimationWrapper from "./page-animation";
 import { LuFileEdit } from "react-icons/lu";
 import { useContext } from "react";
 import { UserContext } from "../App";
 import { removeFromSession } from "../common/session";
 import "../misc/dropdown-nav.css";
+import AnimationWrapper from "../Screens/page-animation";
 
 const UserNavigationPanel = () => {
   const {

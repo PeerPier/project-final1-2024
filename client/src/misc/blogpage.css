@@ -1,0 +1,39 @@
+.blogpage {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+.published-detail {
+  color: #494949;
+  opacity: 0.75;
+}
+
+.text-purple:hover {
+  color: #8b46ff;
+}
+
+.text-twitter:hover {
+  color: #1da1f2;
+}
+
+@media (max-width: 640px) {
+  .detail-user {
+    display: flex;
+    flex-direction: column;
+  }
+  .published-detail {
+    margin-top: 1.5rem;
+    margin-left: 3rem;
+    padding-left: 1.25rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .blogpage {
+    padding-left: 5vw;
+    padding-right: 5vw;
+  }
+}

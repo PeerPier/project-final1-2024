@@ -1,9 +1,9 @@
 import { createContext, useContext, useState } from "react";
 import { UserContext } from "../App";
 import { Navigate } from "react-router-dom";
-import BlogEditor from "./blog-editor-component";
 import PublishForm from "./publish-form";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
+import BlogEditor from "../components/blog-editor-component";
 
 const blogStructure = {
   topic: "",
