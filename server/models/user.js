@@ -92,6 +92,10 @@ const userSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    show_notifications: {
+      type: Boolean,
+      default: true,
+    },
     bio: {
       type: String,
       maxlength: [200, "Bio should not be more than 200"],

@@ -42,6 +42,7 @@ import SearchPage from "./Screens/search.page";
 import PageNotFound from "./Screens/404";
 import ProfilePage from "./Screens/ProfilePage";
 import BlogPage from "./Screens/blog.page";
+import AccountPreferences from "./Screens/AccountPreferences";
 
 interface UserContextType {
   userAuth: {
@@ -128,6 +129,10 @@ function App() {
           />
           <Route path="/chats" element={<Chat />} />
           <Route path="/nav" element={<Navbar2 />} />
+          <Route
+            path="/account/perference/:id"
+            element={<AccountPreferences />}
+          />
         </Routes>
       </ChatContextProvider>
     </UserContext.Provider>

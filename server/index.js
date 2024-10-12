@@ -9,6 +9,7 @@ const serviceAccountKey = require("./kku-blogging-firebase-adminsdk-blvad-4d6e11
 const cookieParser = require("cookie-parser");
 const admin = require("firebase-admin");
 const { getAuth } = require("firebase-admin/auth");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const app = express();
@@ -91,6 +92,39 @@ app.use("/api/report", reportRouter);
 app.use("/uploads", express.static("uploads"));
 app.use("/create-blog", BlogCreated);
 
+const ensureAdminExists = async () => {
+  try {
+    const adminExists = await User.findOne({ is_admin: true });
+
+    if (!adminExists) {
+      const adminPassword = process.env.ADMIN_PASSWORD;
+
+      if (!adminPassword) {
+        throw new Error(
+          "Admin password is not defined in environment variables"
+        );
+      }
+
+      const hashedPassword = await bcrypt.hash(adminPassword, 10);
+
+      const adminUser = new User({
+        username: process.env.ADMIN_USERNAME,
+        email: process.env.ADMIN_EMAIL,
+        password: hashedPassword,
+        fullname: "Admin User", // Provide a default value for fullname
+        is_admin: true,
+      });
+
+      await adminUser.save();
+      console.log("Admin account created");
+    } else {
+      console.log("Admin already exists");
+    }
+  } catch (err) {
+    console.error("Error checking/creating admin:", err);
+  }
+};
+
 const generateUsername = async (email) => {
   const { nanoid } = await import("nanoid");
   let username = email.split("@")[0];
@@ -105,6 +139,7 @@ const generateUsername = async (email) => {
 
   return username;
 };
+
 const formDatatoSend = (user) => {
   const access_token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
   return {
@@ -192,7 +227,11 @@ app.post("/search-blogs", (req, res) => {
 
   if (tag) {
     const lowerCaseTag = tag.toLowerCase();
-    findQuery = { tags: lowerCaseTag, draft: false, blog_id: {$ne: eliminate_blog} };
+    findQuery = {
+      tags: lowerCaseTag,
+      draft: false,
+      blog_id: { $ne: eliminate_blog },
+    };
   } else if (query) {
     findQuery = { draft: false, topic: new RegExp(query, "i") };
   } else if (author) {
@@ -256,6 +295,7 @@ mongoose
   .connect(uri)
   .then(() => {
     console.log("MongoDB connection established");
+    ensureAdminExists();
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
     });

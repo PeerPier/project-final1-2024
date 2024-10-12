@@ -49,6 +49,26 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
 
+  const [userData, setUserData] = useState({
+    show_notifications: true,
+  });
+  const API_BASE_URL = "http://localhost:3001";
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        if (userId) {
+          const response = await axios.get(`${API_BASE_URL}/profile/${userId}`);
+          setUserData(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, [userId]);
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -355,7 +375,7 @@ const Navbar1: React.FC<Navbar1Props> = ({ children }) => {
               className={`uil uil-${showDropdown ? "multiply" : "search"}`}
             />
           </div>
-          <NotificationIcon />
+          {userData.show_notifications ? <NotificationIcon /> : <></>}
           <div className={`items ${showDropdown ? "open" : ""}`}>
             {filteredCate.length > 0 &&
               filteredCate.map((cate) => (
